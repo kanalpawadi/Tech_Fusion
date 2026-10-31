@@ -1,0 +1,13 @@
+# Build output (made by deploy.sh)
+dist/
+
+# Full-size photo backups — the site uses the compressed copies in assets/photos
+assets/originals/
+
+# Local editor / tool settings
+.claude/
+.netlify/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
