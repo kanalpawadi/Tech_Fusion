@@ -2,6 +2,8 @@
 
 Website for **Tech Fusion**, Ichalkaranji: mini & mega engineering projects, industry projects, training and internships across IoT, full-stack software, ML, deep learning and Generative AI.
 
+**Live site:** https://techfusion-ichalkaranji.netlify.app
+
 Plain HTML, CSS and JavaScript, so there's no build step or framework.
 
 ## Pages
