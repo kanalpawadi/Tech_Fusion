@@ -108,9 +108,12 @@ export async function run() {
 
   // ---------- Projects ----------
   const projectCards = $$('.project');
-  check('Projects', '19 project cards', projectCards.length === 19, projectCards.length);
+  check('Projects', '16 project cards', projectCards.length === 16, projectCards.length);
+  for (const t of ['RV Fitness', 'Rising Sun', 'Sunbeam']) {
+    check('Projects', `removed: ${t}`, !projectCards.some((p) => p.textContent.includes(t)));
+  }
   check('Projects', 'all shown by default', projectCards.every((p) => !p.hidden));
-  for (const t of ['AgroIntel', 'AI Personal Mentor', 'Amazon Review', 'Chicks', 'Demand IQ', 'Fruit Classification', 'Gas', 'Health', 'MediLing', 'Mess Tracker', 'Paraphrasing', 'Pothole', 'RV Fitness', 'Rising Sun', 'School Bus', 'Streetlight', 'Sunbeam', 'Water', 'Portfolio']) {
+  for (const t of ['AgroIntel', 'AI Personal Mentor', 'Amazon Review', 'Chicks', 'Demand IQ', 'Fruit Classification', 'Gas', 'Health', 'MediLing', 'Mess Tracker', 'Paraphrasing', 'Pothole', 'School Bus', 'Streetlight', 'Water', 'Portfolio']) {
     check('Projects', `card: ${t}`, projectCards.some((p) => p.querySelector('h3').textContent.includes(t)));
   }
   check('Projects', 'every card has category, title, text, tech', projectCards.every((p) =>

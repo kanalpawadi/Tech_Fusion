@@ -35,7 +35,7 @@ Phone runs include 5 extra mobile-menu tests.
 
 ### Round 2 coverage
 
-- **Projects:** 19 cards, each with category, title, description and tech; all 6 filter buttons show exactly the right cards, only one is active, hidden cards are truly hidden, "All" restores everything.
+- **Projects:** 16 cards, each with category, title, description and tech; all 6 filter buttons show exactly the right cards, only one is active, hidden cards are truly hidden, "All" restores everything.
 - **Registration form:** Student/Industry switches "College" ↔ "Company"; deadline can't be in the past; 14 invalid inputs are each blocked with a message and focus on the wrong field (empty/space-only name, college, bad email, short / non-Indian phone, missing project name/category/type/deadline, past deadline, short description, not agreed); `+91` phone formats accepted; character counter.
 - **Booking & invoice:** ID format `TF-YYMMDD-XXXX`, unique IDs, all details saved, phone normalised, extras saved; booking survives the URL with Unicode (मराठी), quotes and new lines; typed HTML/`<script>` is shown as text, never run; invoice shows every field, readable deadline, correct days left; WhatsApp message carries ID, name, project and deadline.
 - **Invoice page:** renders with booking ID in title and banner; Download creates `TechFusion-Invoice-<ID>.html` containing the full invoice; Print opens the print dialog and hides the toolbar; WhatsApp button; "not found" page when opened without a booking.

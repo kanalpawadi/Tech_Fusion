@@ -124,7 +124,9 @@ check("bookings emailed to business address", "formsubmit.co/ajax/${BUSINESS.ema
 
 # 10c. Projects section
 cards = re.findall(r'<article class="project" data-cat="([^"]+)"', HTML)
-check("19 project cards", len(cards) == 19, len(cards))
+check("16 project cards", len(cards) == 16, len(cards))
+for removed in ["RV Fitness", "Rising Sun", "Sunbeam"]:
+    check(f"removed project not shown: {removed}", removed not in HTML)
 filters = set(re.findall(r'data-filter="([^"]+)"', HTML)) - {"all"}
 used = {c for cat in cards for c in cat.split()}
 check("every project category has a filter button", used <= filters, str(used - filters))
