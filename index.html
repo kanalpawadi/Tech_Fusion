@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
 
@@ -104,69 +104,113 @@
       </div>
 
       <div class="cards">
-        <article class="card" data-tilt>
+        <article class="card card-electronics" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></svg>
           </div>
           <h3>Electronics &amp; Embedded</h3>
           <p>Arduino, ESP32, Raspberry Pi, sensors, PCB design, power supplies and automation circuits.</p>
+          <div class="card-pills">
+            <span>Arduino</span><span>ESP32</span><span>PCB Design</span><span>Sensors</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-iot" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/><path d="M1.5 9a15 15 0 0 1 21 0"/></svg>
           </div>
           <h3>IoT &amp; Robotics</h3>
           <p>Smart home, smart agriculture, rain alerts, object counters, rovers, robotic arms and RC builds.</p>
+          <div class="card-pills">
+            <span>Smart Home</span><span>Rovers</span><span>MQTT</span><span>Automation</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-software" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
           </div>
           <h3>Software &amp; Full-Stack</h3>
           <p>Web apps, mobile apps, desktop software and APIs in every major tech stack — MERN, Java, Python, PHP, Flutter and more.</p>
+          <div class="card-pills">
+            <span>React</span><span>Node.js</span><span>Python</span><span>Flutter</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-ml" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 7l3 4M7 17l3-4M14 11l3-4M14 13l3 4"/></svg>
           </div>
           <h3>Machine Learning &amp; Deep Learning</h3>
           <p>Prediction models, classification, computer vision, NLP, CNNs, RNNs and data-science dashboards.</p>
+          <div class="card-pills">
+            <span>TensorFlow</span><span>PyTorch</span><span>OpenCV</span><span>YOLO</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card card-featured" data-tilt>
+
+        <article class="card card-featured card-genai" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>
           </div>
           <h3>Generative AI</h3>
           <p>LLM chatbots, RAG apps over your documents, AI agents, image generation and prompt-engineered tools.</p>
           <span class="tag">New</span>
+          <div class="card-pills">
+            <span>LangChain</span><span>RAG</span><span>Vector DBs</span><span>AI Agents</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-industry" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>
           </div>
           <h3>Industry Projects</h3>
           <p>Custom automation, monitoring systems and software solutions built for small businesses and industries.</p>
+          <div class="card-pills">
+            <span>Automation</span><span>IoT Telemetry</span><span>SCADA</span><span>Industrial</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-degree" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
           </div>
           <h3>B.Tech / Diploma / MCA</h3>
           <p>Mini &amp; mega final-year projects with report, PPT, documentation and viva preparation.</p>
+          <div class="card-pills">
+            <span>IEEE Report</span><span>Black Book</span><span>PPT</span><span>Viva Prep</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-training" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
           </div>
           <h3>Training &amp; Internship</h3>
           <p>Hands-on industrial training and internships with certificate — learn by building real projects.</p>
+          <div class="card-pills">
+            <span>Lab Workshop</span><span>Certificate</span><span>Live Batches</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
-        <article class="card" data-tilt>
+
+        <article class="card card-stem" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg>
           </div>
           <h3>School STEM Workshops</h3>
           <p>Fun, practical electronics and robotics sessions for school students — we come to your school.</p>
+          <div class="card-pills">
+            <span>Robotics</span><span>Hands-on</span><span>STEM Kits</span><span>Schools</span>
+          </div>
+          <div class="card-action"><span>Explore Tech</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></div>
         </article>
       </div>
     </div>
