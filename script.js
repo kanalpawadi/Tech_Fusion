@@ -166,11 +166,11 @@ reg.addEventListener('submit', async (e) => {
   const invoiceUrl = new URL(`invoice.html#${hash}`, window.location.href).href;
   regSubmit.disabled = true;
   regSubmit.textContent = 'Sending confirmation…';
-  const mailed = await TFInvoice.sendEmails(booking, invoiceUrl);
+  const mail = await TFInvoice.sendEmails(booking, invoiceUrl);
   regSubmit.disabled = false;
   regSubmit.textContent = 'Submit & get invoice';
 
-  TFInvoice.navigate(`invoice.html?mail=${mailed ? 'sent' : 'failed'}#${hash}`);
+  TFInvoice.navigate(`invoice.html?mail=${mail}#${hash}`);
 });
 
 // Reveal on scroll

@@ -15,6 +15,13 @@
   // The very first submission sends an activation email to BUSINESS.email that must be clicked once.
   const MAIL_ENDPOINT = `https://formsubmit.co/ajax/${BUSINESS.email}`;
 
+  // Backup when FormSubmit is down: Web3Forms delivers the booking to Tech Fusion only (no client auto-reply on the free plan).
+  // The access key is public by design; leave it empty to switch the backup off.
+  const BACKUP = {
+    endpoint: 'https://api.web3forms.com/submit',
+    accessKey: '52d1851d-042a-42e7-a43d-a26cedfd09fe',
+  };
+
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // Unicode-safe base64url, so bookings survive in the URL hash.
@@ -77,30 +84,12 @@
     ].join('\n');
   }
 
-  // Emails the booking to Tech Fusion and a confirmation to the client. Resolves true/false, never throws.
-  async function sendEmails(b, invoiceUrl, timeoutMs = 10000) {
-    const payload = {
-      _subject: `New project booking ${b.id} — ${b.projectName}`,
-      _template: 'table',
-      _captcha: 'false',
-      _autoresponse: clientEmailText(b, invoiceUrl),
-      email: b.email,
-      name: b.fullName,
-      'Booking ID': b.id,
-      'Client type': b.clientType,
-      [b.clientType === 'Industry' ? 'Company' : 'College']: b.organisation,
-      'Branch / Designation': b.department || '-',
-      Phone: b.phone,
-      City: b.city || '-',
-      Project: b.projectName,
-      'Project type': b.projectType,
-      Description: b.description,
-      'Invoice link': invoiceUrl,
-    };
+  // POSTs JSON and resolves true only when the service reports success. Never throws.
+  async function postJSON(url, payload, timeoutMs) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-      const res = await fetch(MAIL_ENDPOINT, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
@@ -113,6 +102,47 @@
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  // Emails the booking to Tech Fusion and a confirmation to the client.
+  // Resolves 'sent' (FormSubmit), 'backup' (Web3Forms, Tech Fusion only) or 'failed'. Never throws.
+  async function sendEmails(b, invoiceUrl, timeoutMs = 8000) {
+    const details = {
+      'Booking ID': b.id,
+      'Client type': b.clientType,
+      [b.clientType === 'Industry' ? 'Company' : 'College']: b.organisation,
+      'Branch / Designation': b.department || '-',
+      Phone: b.phone,
+      City: b.city || '-',
+      Project: b.projectName,
+      'Project type': b.projectType,
+      Description: b.description,
+      'Invoice link': invoiceUrl,
+    };
+    const subject = `New project booking ${b.id} — ${b.projectName}`;
+
+    const sent = await postJSON(MAIL_ENDPOINT, {
+      _subject: subject,
+      _template: 'table',
+      _captcha: 'false',
+      _autoresponse: clientEmailText(b, invoiceUrl),
+      email: b.email,
+      name: b.fullName,
+      ...details,
+    }, timeoutMs);
+    if (sent) return 'sent';
+
+    if (!BACKUP.accessKey) return 'failed';
+    const backedUp = await postJSON(BACKUP.endpoint, {
+      access_key: BACKUP.accessKey,
+      subject: `${subject} (backup)`,
+      from_name: 'Tech Fusion website',
+      replyto: b.email,
+      name: b.fullName,
+      email: b.email,
+      ...details,
+    }, timeoutMs);
+    return backedUp ? 'backup' : 'failed';
   }
 
   const navigate = (url) => { window.location.href = url; };
@@ -278,5 +308,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
 
-  window.TFInvoice = { BUSINESS, MAIL_ENDPOINT, CSS, esc, encode, decode, newBookingId, fmtDate, fileName, whatsappText, clientEmailText, sendEmails, navigate, renderBody, renderDocument, download };
+  window.TFInvoice = { BUSINESS, MAIL_ENDPOINT, BACKUP, CSS, esc, encode, decode, newBookingId, fmtDate, fileName, whatsappText, clientEmailText, sendEmails, navigate, renderBody, renderDocument, download };
 })();

@@ -78,7 +78,7 @@
     <p><a href="index.html#register">Register a project</a></p>
   </section>
 
-  <script src="invoice.js?v=5"></script>
+  <script src="invoice.js?v=7"></script>
   <script>
     (function () {
       const T = window.TFInvoice;
@@ -101,6 +101,9 @@
         if (mail === 'sent') {
           status.classList.add('ok');
           status.textContent = `✉ Confirmation emailed to ${booking.email} — Tech Fusion has received your booking.`;
+        } else if (mail === 'backup') {
+          status.classList.add('ok');
+          status.textContent = `✓ Tech Fusion has received your booking. Our confirmation email may be delayed, so please keep this invoice — we'll contact you on ${booking.phone}.`;
         } else {
           status.classList.add('warn');
           status.textContent = `We couldn't send the confirmation email right now. Please tap "Send to Tech Fusion on WhatsApp" so we receive your booking.`;

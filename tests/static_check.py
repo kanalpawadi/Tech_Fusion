@@ -126,6 +126,8 @@ check(f"invoice escapes every booking value ({render.count('esc(b.')} escaped)",
 check("invoice page is not indexed by search engines", 'name="robots" content="noindex"' in INV)
 
 check("contact shows business email", 'href="mailto:techfusionteamwork@gmail.com"' in HTML)
+check("backup email service configured (Web3Forms)", "api.web3forms.com/submit" in INVJS and "accessKey:" in INVJS)
+check("invoice page handles mail=backup", "mail === 'backup'" in INV)
 check("bookings emailed to business address", "formsubmit.co/ajax/${BUSINESS.email}" in INVJS and "email: 'techfusionteamwork@gmail.com'" in INVJS)
 
 # 10c. Projects section

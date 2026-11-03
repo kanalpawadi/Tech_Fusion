@@ -113,3 +113,16 @@ Project details now ask only for **project title**, **Mini / Mega project** and 
 | Static checks | — | 64 / 64 pass |
 | Browser components | 1280 / 768 px | 224 / 224 pass |
 | Browser components | 375 / 320 px | 229 / 229 pass |
+
+## Round 5 — backup email service (2026-11-03)
+
+FormSubmit had a full outage (Cloudflare 522 on every page, from two networks). Added **Web3Forms** as a backup: if FormSubmit fails, the booking is sent to techfusionteamwork@gmail.com through Web3Forms (subject ends "(backup)", reply-to is the client). The free Web3Forms plan has no client auto-reply, so the invoice page tells the client "Tech Fusion has received your booking… keep this invoice". If both fail, the WhatsApp fallback message shows.
+
+| Suite | Width | Result |
+|---|---|---|
+| Static checks | — | 66 / 66 pass |
+| Browser components | 1280 / 768 px | 234 / 234 pass |
+| Browser components | 375 / 320 px | 239 / 239 pass |
+| Invoice page, backup mode | 320 px | 14 / 14 pass |
+
+New tests (fake services only): backup not used when FormSubmit works; FormSubmit 522 → Web3Forms with access key, "(backup)" subject, client reply-to, all details, no FormSubmit-only fields; both failing or offline → "failed"; no key → backup skipped.

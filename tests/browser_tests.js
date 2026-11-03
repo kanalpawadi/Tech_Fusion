@@ -149,12 +149,18 @@ export async function run() {
   TFInvoice.navigate = (url) => redirects.push(url);
   const realFetch = window.fetch;
   const mails = [];
+  // mailMode drives FormSubmit, backupMode drives Web3Forms: 'ok' | 'error' | 'network' | 'down' (Cloudflare 522)
   let mailMode = 'ok';
+  let backupMode = 'ok';
+  const realBackupKey = TFInvoice.BACKUP.accessKey;
+  TFInvoice.BACKUP.accessKey = '';
   window.fetch = async (url, opts) => {
     mails.push({ url, opts, body: JSON.parse(opts.body) });
-    if (mailMode === 'network') throw new TypeError('Failed to fetch');
-    if (mailMode === 'error') return new Response(JSON.stringify({ success: 'false', message: 'not activated' }), { status: 200 });
-    return new Response(JSON.stringify({ success: 'true', message: 'The form was submitted successfully.' }), { status: 200 });
+    const mode = url.includes('web3forms') ? backupMode : mailMode;
+    if (mode === 'network') throw new TypeError('Failed to fetch');
+    if (mode === 'down') return new Response('error code: 522', { status: 522 });
+    if (mode === 'error') return new Response(JSON.stringify({ success: 'false', message: 'not activated' }), { status: 200 });
+    return new Response(JSON.stringify({ success: url.includes('web3forms') ? true : 'true', message: 'ok' }), { status: 200 });
   };
 
   const fill = (over = {}) => {
@@ -254,7 +260,39 @@ export async function run() {
   await submit();
   check('Email', 'offline -> still shows invoice, marked failed', downloads.length === 1 && redirects[0] && redirects[0].startsWith('invoice.html?mail=failed#'), redirects[0]);
   check('Email', 'submit button re-enabled after sending', !rf.querySelector('.reg-submit').disabled && rf.querySelector('.reg-submit').textContent === 'Submit & get invoice');
+  mailMode = 'down';
+  fill();
+  await submit();
+  check('Email', 'FormSubmit outage (522), no backup key -> failed, one request', redirects[0] && redirects[0].startsWith('invoice.html?mail=failed#') && mails.length === 1, `${redirects[0]} / ${mails.length} requests`);
+
+  // Backup (Web3Forms)
+  TFInvoice.BACKUP.accessKey = 'test-key-123';
   mailMode = 'ok';
+  fill();
+  await submit();
+  check('Backup', 'not used when FormSubmit works', mails.length === 1 && redirects[0].startsWith('invoice.html?mail=sent#'), `${mails.length} requests`);
+  mailMode = 'down';
+  fill({ fullName: 'Backup Tester' });
+  await submit();
+  const bm = mails[1];
+  check('Backup', 'FormSubmit down -> booking sent via backup', mails.length === 2 && redirects[0] && redirects[0].startsWith('invoice.html?mail=backup#'), `${mails.length} requests, ${redirects[0]}`);
+  check('Backup', 'backup goes to Web3Forms with the access key', bm && bm.url === 'https://api.web3forms.com/submit' && bm.body.access_key === 'test-key-123');
+  check('Backup', 'backup subject marks it as backup', bm && bm.body.subject.includes(downloads[0].id) && bm.body.subject.endsWith('(backup)'));
+  check('Backup', 'reply-to is the client', bm && bm.body.replyto === 'test@example.com' && bm.body.name === 'Backup Tester');
+  check('Backup', 'backup carries all booking details', bm && ['Booking ID', 'Client type', 'College', 'Phone', 'Project', 'Project type', 'Description', 'Invoice link'].every((k) => k in bm.body), bm && Object.keys(bm.body).join());
+  check('Backup', 'no FormSubmit-only fields in backup', bm && !Object.keys(bm.body).some((k) => k.startsWith('_')));
+  mailMode = 'network';
+  backupMode = 'error';
+  fill();
+  await submit();
+  check('Backup', 'both services fail -> failed', mails.length === 2 && redirects[0].startsWith('invoice.html?mail=failed#'), redirects[0]);
+  backupMode = 'network';
+  fill();
+  await submit();
+  check('Backup', 'both offline -> failed', mails.length === 2 && redirects[0].startsWith('invoice.html?mail=failed#'), redirects[0]);
+  TFInvoice.BACKUP.accessKey = realBackupKey;
+  mailMode = 'ok';
+  backupMode = 'ok';
   check('Register', 'booking ID format TF-YYMMDD-XXXX', bk && /^TF-\d{6}-[A-Z0-9]{4}$/.test(bk.id), bk && bk.id);
   check('Register', 'booking keeps all details', bk && bk.clientType === 'Industry' && bk.organisation === 'DKTE College' && bk.projectName === 'Smart Parking' && bk.projectType === 'Mini project' && bk.description.includes('मराठी'));
   check('Register', 'phone normalised to +91 format', bk && bk.phone === '+91 98765 43210', bk && bk.phone);
@@ -423,6 +461,7 @@ export async function runInvoicePage() {
     const mail = new URLSearchParams(location.search).get('mail');
     const st = $('#mail-status');
     if (mail === 'sent') check('Invoice page', 'shows "emailed to <client>"', !st.hidden && st.textContent.includes(b.email) && st.classList.contains('ok'));
+    else if (mail === 'backup') check('Invoice page', 'backup: says booking received, keep invoice', !st.hidden && st.textContent.includes('received your booking') && st.textContent.includes(b.phone) && st.classList.contains('ok'));
     else if (mail === 'failed') check('Invoice page', 'shows email-failed warning pointing to WhatsApp', !st.hidden && st.textContent.includes('WhatsApp') && st.classList.contains('warn'));
     else check('Invoice page', 'opened from email link: no status, "Your booking invoice"', st.hidden && $('#success-title').textContent === 'Your booking invoice');
     check('Invoice page', 'footer shows business email', $('.tfi-foot').textContent.includes('techfusionteamwork@gmail.com'));
