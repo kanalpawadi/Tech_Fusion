@@ -192,6 +192,10 @@ export async function run() {
   }
   rf.description.value = 'abc'; rf.description.dispatchEvent(new Event('input'));
   check('Register', 'character counter updates', rf.querySelector('.char-count').textContent === '3 / 2000');
+  rf.querySelector('input[value="Industry"]').click(); await wait();
+  rf.reset(); await new Promise((r) => setTimeout(r, 30));
+  check('Register', 'after reset: Student labels shown again', rf.clientType.value === 'Student' && isVisible(rf.querySelector('[data-student]')) && !isVisible(rf.querySelector('[data-industry]')));
+  check('Register', 'after reset: counter back to 0', rf.querySelector('.char-count').textContent === '0 / 2000', rf.querySelector('.char-count').textContent);
 
   const invalidCases = [
     ['empty name', { fullName: '' }, 'fullName'],

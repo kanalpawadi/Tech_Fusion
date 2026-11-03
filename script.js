@@ -73,18 +73,20 @@ document.querySelectorAll('.filter').forEach((btn) =>
 const reg = document.getElementById('register-form');
 const regError = reg.querySelector('.form-error');
 const charCount = reg.querySelector('.char-count');
-reg.description.addEventListener('input', () => {
-  charCount.textContent = `${reg.description.value.length} / 2000`;
-});
 
-// Swap "College" / "Company" labels by client type
-reg.querySelectorAll('input[name="clientType"]').forEach((r) =>
-  r.addEventListener('change', () => {
-    const industry = reg.clientType.value === 'Industry';
-    reg.querySelectorAll('[data-student]').forEach((el) => { el.hidden = industry; });
-    reg.querySelectorAll('[data-industry]').forEach((el) => { el.hidden = !industry; });
-  })
-);
+// Keep the counter and the "College" / "Company" labels in step with the form,
+// including after a reset or when the browser restores a half-filled form (Back button).
+function syncRegForm() {
+  charCount.textContent = `${reg.description.value.length} / 2000`;
+  const industry = reg.clientType.value === 'Industry';
+  reg.querySelectorAll('[data-student]').forEach((el) => { el.hidden = industry; });
+  reg.querySelectorAll('[data-industry]').forEach((el) => { el.hidden = !industry; });
+}
+reg.description.addEventListener('input', syncRegForm);
+reg.querySelectorAll('input[name="clientType"]').forEach((r) => r.addEventListener('change', syncRegForm));
+reg.addEventListener('reset', () => setTimeout(syncRegForm)); // values change after the reset event
+window.addEventListener('pageshow', syncRegForm);
+syncRegForm();
 
 reg.querySelectorAll('input[name="projectType"]').forEach((r) =>
   r.addEventListener('change', () => reg.querySelector('.reg-type').removeAttribute('aria-invalid'))
@@ -172,6 +174,20 @@ reg.addEventListener('submit', async (e) => {
 
   TFInvoice.navigate(`invoice.html?mail=${mail}#${hash}`);
 });
+
+// Hide the floating WhatsApp button while a form's submit area is on screen
+const waFloat = document.querySelector('.wa-float');
+const submitButtons = document.querySelectorAll('.reg-submit, #enquiry button[type="submit"]');
+function updateWaFloat() {
+  const onScreen = [...submitButtons].some((btn) => {
+    const r = btn.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
+  });
+  waFloat.classList.toggle('wa-away', onScreen);
+}
+window.addEventListener('scroll', updateWaFloat, { passive: true });
+window.addEventListener('resize', updateWaFloat);
+updateWaFloat();
 
 // Reveal on scroll
 const revealEls = document.querySelectorAll('.card, .stack-group, .steps li, .gallery figure, .section-head, .project');

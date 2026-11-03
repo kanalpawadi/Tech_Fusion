@@ -130,3 +130,24 @@ New tests (fake services only): backup not used when FormSubmit works; FormSubmi
 ### Live backup test (2026-11-03)
 
 Test booking `TF-261103-11TJ` from https://techfusion-ichalkaranji.netlify.app while FormSubmit was down: FormSubmit timed out after 8 s, Web3Forms accepted it in 1.6 s, invoice page showed the "received your booking" message, and **the "(backup)" email arrived in techfusionteamwork@gmail.com** (confirmed by Tech Fusion).
+
+## Round 6 — every phone size (2026-11-03)
+
+New `tests/responsive_audit.js` checks a page at the current width for: sideways scrolling, anything sticking out of the screen, clipped text, text spilling out of buttons, tap targets under 40 px, form fields under 16 px (iPhones zoom in on those), text under 12 px, squashed images, very long headings, and the WhatsApp button covering a submit button. Run it in the browser console:
+
+```js
+await import('/tests/responsive_audit.js?v=' + Date.now()).then(m => m.audit())
+```
+
+**Result: main page, invoice page (with a booking) and invoice page (empty) all pass at 18 sizes** — 280×653 (Galaxy Fold), 320×568 (iPhone SE 1st gen), 360×740, 375×667, 390×844, 412×915, 430×932, landscape 568×320 / 667×375 / 740×360 / 844×390 / 932×430, tablets 600×960 / 761×1024 / 800×1280 / 1024×768, desktop 1280×800 / 1440×900. Feature tests: 236/236 desktop & tablet, 241/241 phone; static 68/68.
+
+### Fixed
+1. Form fields were 14 px → iPhones zoomed in when tapping them. Now 16 px.
+2. On 280–320 px phones the "I am a" row made the whole page scroll sideways (form groups don't shrink by default). Fixed.
+3. "I am a" and Mini/Mega buttons squeezed their text out of the box. Radio dots hidden on phones (the yellow fill shows the choice; keyboard/screen readers still work); buttons wrap to two rows on the narrowest phones; 44 px tall.
+4. Hero badges were cut off by the WhatsApp button → now neat full-width rows on phones; hero buttons full width.
+5. Project filter buttons scrolled sideways (hidden) → now wrap onto lines.
+6. The floating WhatsApp button covered "Submit & get invoice" / "Send on WhatsApp" → it now slides away while a submit button is on screen.
+7. Logo tap area 36 px → 44 px; "New" tag and invoice labels raised to 12 px; "I confirm" checkbox row given a bigger tap area.
+8. Invoice: on 280 px phones the info box stuck out → one column below 380 px.
+9. After the form was cleared (or restored by the Back button), labels could say "Company name" with Student selected and the counter showed old text length → labels and counter now always match the form.
