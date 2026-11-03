@@ -69,6 +69,14 @@ document.querySelectorAll('.filter').forEach((btn) =>
   })
 );
 
+// "Explore Tech" on a service card jumps to Projects with the matching filter on
+document.querySelectorAll('.card-action[data-filter]').forEach((link) =>
+  link.addEventListener('click', () => {
+    const btn = document.querySelector(`.filter[data-filter="${link.dataset.filter}"]`);
+    if (btn) btn.click();
+  })
+);
+
 // Project registration -> booking invoice
 const reg = document.getElementById('register-form');
 const regError = reg.querySelector('.form-error');

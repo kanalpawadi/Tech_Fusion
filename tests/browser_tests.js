@@ -93,6 +93,28 @@ export async function run() {
   const featured = $('.card-featured');
   check('Services', 'Gen AI card is black with "New" tag', getComputedStyle(featured).backgroundColor === 'rgb(11, 11, 11)' && featured.querySelector('.tag'));
 
+  // Service card links ("Explore Tech" / "See Training" / "See Workshops")
+  const cardLinks = cards.map((c) => c.querySelector('a.card-action'));
+  check('Service links', 'every service card has a link', cardLinks.every(Boolean), cardLinks.filter((l) => !l).length + ' missing');
+  check('Service links', 'every link goes to a real section', cardLinks.every((l) => l && document.querySelector(l.hash)));
+  check('Service links', 'every link has a descriptive label', cardLinks.every((l) => l && /: .{4,}/.test(l.getAttribute('aria-label') || '')));
+  const expectFilter = { 'Electronics': 'iot', 'IoT': 'iot', 'Software': 'web', 'Machine Learning': 'ai', 'Generative AI': 'genai', 'Industry': 'all', 'B.Tech': 'all' };
+  for (const [title, flt] of Object.entries(expectFilter)) {
+    const card = cards.find((c) => c.querySelector('h3').textContent.includes(title));
+    const link = card && card.querySelector('a.card-action');
+    if (!link) { check('Service links', `${title} link exists`, false); continue; }
+    if (flt !== 'all') document.querySelector('.filter[data-filter="all"]').click();
+    else document.querySelector('.filter[data-filter="genai"]').click();
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    const active = document.querySelector('.filter.active');
+    const shown = [...document.querySelectorAll('.project')].filter((p) => !p.hidden);
+    check('Service links', `"${title}" opens Projects filtered to ${flt}`, link.hash === '#projects' && active && active.dataset.filter === flt && shown.length > 0 && shown.every((p) => flt === 'all' || p.dataset.cat.split(' ').includes(flt)), `active: ${active && active.dataset.filter}, shown: ${shown.length}`);
+  }
+  check('Service links', 'Training card -> #training', cards.find((c) => c.querySelector('h3').textContent.includes('Training')).querySelector('a.card-action').hash === '#training');
+  check('Service links', 'STEM card -> #gallery', cards.find((c) => c.querySelector('h3').textContent.includes('STEM')).querySelector('a.card-action').hash === '#gallery');
+  document.querySelector('.filter[data-filter="all"]').click();
+  history.replaceState(null, '', location.pathname + location.search);
+
   // ---------- Tech stack ----------
   const groups = $$('.stack-group');
   check('Tech stack', '6 stack groups', groups.length === 6, groups.length);

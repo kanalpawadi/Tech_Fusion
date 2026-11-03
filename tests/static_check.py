@@ -144,7 +144,7 @@ check("every filter button has projects", filters <= used, str(filters - used))
 for sel in re.findall(r"getElementById\('([^']+)'\)", JS):
     check(f"JS #{sel} exists in HTML", sel in ids)
 for sel in re.findall(r"querySelector(?:All)?\('([^']+)'\)", JS):
-    first = sel.split(",")[0].strip().split()[0]
+    first = re.split(r"[\[:]", sel.split(",")[0].strip().split()[0])[0]
     if first.startswith("."):
         check(f"JS selector {first} exists", f'class="{first[1:]}' in HTML or f' {first[1:]}"' in HTML or f' {first[1:]} ' in HTML)
 
