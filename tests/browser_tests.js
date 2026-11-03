@@ -157,15 +157,12 @@ export async function run() {
     return new Response(JSON.stringify({ success: 'true', message: 'The form was submitted successfully.' }), { status: 200 });
   };
 
-  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  const future = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
-  const past = new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10);
   const fill = (over = {}) => {
     rf.reset();
     const base = {
       fullName: 'Test Student', organisation: 'DKTE College', department: 'B.Tech CSE', email: 'test@example.com',
-      phone: '98765 43210', city: 'Ichalkaranji', projectName: 'Smart Parking', category: 'IoT / Embedded',
-      projectType: 'Mini project', deadline: future, budget: '', techStack: 'ESP32',
+      phone: '98765 43210', city: 'Ichalkaranji', projectName: 'Smart Parking',
+      projectType: 'Mini project',
       description: 'Detect free parking slots with IR sensors and show them on a web page.',
     };
     Object.entries({ ...base, ...over }).forEach(([k, v]) => { rf[k].value = v; });
@@ -179,10 +176,14 @@ export async function run() {
   rf.querySelector('input[value="Industry"]').click(); await wait();
   check('Register', 'switches to "Company name" for industry', isVisible(rf.querySelector('[data-industry]')) && !isVisible(rf.querySelector('[data-student]')));
   rf.querySelector('input[value="Student"]').click(); await wait();
-  check('Register', 'deadline cannot be before today (min)', rf.deadline.min === today, rf.deadline.min);
-  check('Register', '9 categories + placeholder', rf.category.options.length === 10);
-  check('Register', '5 project types + placeholder', rf.projectType.options.length === 6);
-  check('Register', '6 optional extras', rf.querySelectorAll('input[name="extras"]').length === 6);
+  const typeRadios = [...rf.querySelectorAll('input[name="projectType"]')];
+  check('Register', 'project type is Mini or Mega only', typeRadios.map((r) => r.value).join() === 'Mini project,Mega project');
+  check('Register', 'no project type chosen by default', typeRadios.every((r) => !r.checked));
+  const projectFields = [...rf.querySelectorAll('.reg-block:nth-child(2) input, .reg-block:nth-child(2) select, .reg-block:nth-child(2) textarea')].map((e) => e.name);
+  check('Register', 'project section has only title, type, description', [...new Set(projectFields)].join() === 'projectName,projectType,description', projectFields.join());
+  for (const gone of ['category', 'deadline', 'budget', 'techStack', 'extras']) {
+    check('Register', `removed field: ${gone}`, !rf.querySelector(`[name="${gone}"]`));
+  }
   rf.description.value = 'abc'; rf.description.dispatchEvent(new Event('input'));
   check('Register', 'character counter updates', rf.querySelector('.char-count').textContent === '3 / 2000');
 
@@ -195,10 +196,8 @@ export async function run() {
     ['short phone', { phone: '98765' }, 'phone'],
     ['phone not starting 6-9', { phone: '1234567890' }, 'phone'],
     ['empty project name', { projectName: '' }, 'projectName'],
-    ['no category', { category: '' }, 'category'],
     ['no project type', { projectType: '' }, 'projectType'],
-    ['no deadline', { deadline: '' }, 'deadline'],
-    ['past deadline', { deadline: past }, 'deadline'],
+    ['empty description', { description: '' }, 'description'],
     ['short description', { description: 'too short' }, 'description'],
     ['not agreed', { agree: false }, 'agree'],
   ];
@@ -206,18 +205,21 @@ export async function run() {
     fill(over);
     await submit();
     check('Register', `blocks ${label}`, !downloads.length && !redirects.length && !mails.length, 'invoice was created');
-    check('Register', `shows error for ${label}`, !rErr.hidden && rErr.textContent.length > 5 && document.activeElement === rf[field] && rf[field].getAttribute('aria-invalid') === 'true', `error: "${rErr.textContent}", focus: ${document.activeElement && document.activeElement.name}`);
+    const flagged = field === 'projectType'
+      ? document.activeElement === typeRadios[0] && rf.querySelector('.reg-type').getAttribute('aria-invalid') === 'true'
+      : document.activeElement === rf[field] && rf[field].getAttribute('aria-invalid') === 'true';
+    check('Register', `shows error for ${label}`, !rErr.hidden && rErr.textContent.length > 5 && flagged, `error: "${rErr.textContent}", focus: ${document.activeElement && document.activeElement.name}`);
   }
 
-  fill({ deadline: today, phone: '+91 98765-43210' });
+  rf.querySelector('input[value="Mega project"]').click();
+  check('Register', 'choosing a type clears its red highlight', !rf.querySelector('.reg-type').hasAttribute('aria-invalid'));
+  fill({ projectType: 'Mega project', phone: '+91 98765-43210' });
   await submit();
-  check('Register', 'accepts deadline = today and +91 phone format', downloads.length === 1, rErr.textContent);
+  check('Register', 'accepts Mega project and +91 phone format', downloads.length === 1 && downloads[0].projectType === 'Mega project', rErr.textContent);
   check('Register', 'error message clears on success', rErr.hidden);
 
   fill({ fullName: 'Asha <script>alert(1)</script> & Co', description: 'Line one with "quotes" & <b>tags</b>\nLine two — मराठी text ✓' });
   rf.querySelector('input[value="Industry"]').click();
-  rf.querySelector('input[value="Project report"]').checked = true;
-  rf.querySelector('input[value="Hardware kit"]').checked = true;
   await submit();
   const bk = downloads[0];
   check('Register', 'valid form creates one booking', downloads.length === 1, rErr.textContent);
@@ -232,15 +234,16 @@ export async function run() {
   check('Email', 'subject has booking ID and project', m && m.body._subject.includes(bk.id) && m.body._subject.includes('Smart Parking'));
   check('Email', 'table layout, no captcha page', m && m.body._template === 'table' && m.body._captcha === 'false');
   check('Email', 'client email set for reply + auto-reply', m && m.body.email === 'test@example.com');
-  check('Email', 'all booking details included', m && ['Booking ID', 'Client type', 'Company', 'Phone', 'Project', 'Category', 'Project type', 'Deadline', 'Budget', 'Tech stack', 'Extras', 'Description', 'Invoice link'].every((k) => k in m.body), m && Object.keys(m.body).join());
+  check('Email', 'all booking details included', m && ['Booking ID', 'Client type', 'Company', 'Branch / Designation', 'Phone', 'City', 'Project', 'Project type', 'Description', 'Invoice link'].every((k) => k in m.body), m && Object.keys(m.body).join());
   check('Email', 'industry client labelled Company (not College)', m && m.body.Company === 'DKTE College' && !('College' in m.body));
-  check('Email', 'extras listed', m && m.body.Extras === 'Project report, Hardware kit', m && m.body.Extras);
+  check('Email', 'no removed fields in email', m && ['Category', 'Deadline', 'Budget', 'Tech stack', 'Extras'].every((k) => !(k in m.body)), m && Object.keys(m.body).join());
+  check('Email', 'project type in email', m && m.body['Project type'] === 'Mini project');
   check('Email', 'Unicode description intact', m && m.body.Description.includes('मराठी text ✓'));
   const link = m && m.body['Invoice link'];
   check('Email', 'invoice link is an absolute invoice.html URL', link && /^https?:\/\/.+\/invoice\.html#[\w-]+$/.test(link), link);
   check('Email', 'invoice link opens this booking', link && TFInvoice.decode(link.split('#')[1]).id === bk.id);
   const auto = m ? m.body._autoresponse : '';
-  check('Email', 'client auto-reply has greeting, ID, project, deadline, link', [`Hi ${bk.fullName}`, bk.id, 'Smart Parking', TFInvoice.fmtDate(future), link, '+91 75071 90468'].every((x) => auto.includes(x)));
+  check('Email', 'client auto-reply has greeting, ID, project, type, link', [`Hi ${bk.fullName}`, bk.id, 'Smart Parking', 'Type: Mini project', link, '+91 75071 90468'].every((x) => auto.includes(x)));
 
   fill();
   mailMode = 'error';
@@ -253,9 +256,9 @@ export async function run() {
   check('Email', 'submit button re-enabled after sending', !rf.querySelector('.reg-submit').disabled && rf.querySelector('.reg-submit').textContent === 'Submit & get invoice');
   mailMode = 'ok';
   check('Register', 'booking ID format TF-YYMMDD-XXXX', bk && /^TF-\d{6}-[A-Z0-9]{4}$/.test(bk.id), bk && bk.id);
-  check('Register', 'booking keeps all details', bk && bk.clientType === 'Industry' && bk.organisation === 'DKTE College' && bk.projectName === 'Smart Parking' && bk.deadline === future && bk.techStack === 'ESP32');
+  check('Register', 'booking keeps all details', bk && bk.clientType === 'Industry' && bk.organisation === 'DKTE College' && bk.projectName === 'Smart Parking' && bk.projectType === 'Mini project' && bk.description.includes('मराठी'));
   check('Register', 'phone normalised to +91 format', bk && bk.phone === '+91 98765 43210', bk && bk.phone);
-  check('Register', 'chosen extras saved', bk && bk.extras.join() === 'Project report,Hardware kit', bk && bk.extras);
+  check('Register', 'booking has no removed fields', bk && ['category', 'deadline', 'budget', 'techStack', 'extras'].every((k) => !(k in bk)), bk && Object.keys(bk).join());
   check('Register', 'two bookings get different IDs', new Set(Array.from({ length: 50 }, () => TFInvoice.newBookingId())).size >= 49);
 
   // Invoice content
@@ -267,15 +270,15 @@ export async function run() {
   const parsed = new DOMParser().parseFromString(docHtml, 'text/html');
   check('Invoice', 'no script tags inside the invoice', parsed.querySelectorAll('script').length === 0);
   const invText = parsed.body.textContent;
-  for (const [label, val] of [['booking ID', bk && bk.id], ['name', 'Asha <script>alert(1)</script> & Co'], ['company', 'DKTE College'], ['email', 'test@example.com'], ['phone', '+91 98765 43210'], ['project', 'Smart Parking'], ['category', 'IoT / Embedded'], ['type', 'Mini project'], ['Unicode description', 'मराठी text ✓'], ['extra item', 'Hardware kit'], ['status', 'Awaiting confirmation'], ['business phone', '+91 75071 90468']]) {
+  for (const [label, val] of [['booking ID', bk && bk.id], ['name', 'Asha <script>alert(1)</script> & Co'], ['company', 'DKTE College'], ['email', 'test@example.com'], ['phone', '+91 98765 43210'], ['project', 'Smart Parking'], ['type', 'Mini project'], ['Unicode description', 'मराठी text ✓'], ['status', 'Awaiting confirmation'], ['business phone', '+91 75071 90468']]) {
     check('Invoice', `shows ${label}`, invText.includes(val), val);
   }
   check('Invoice', 'labels industry client as Company', invText.includes('Company: DKTE College'));
-  check('Invoice', 'deadline shown as readable date', invText.includes(TFInvoice.fmtDate(future)));
-  check('Invoice', 'days left correct', TFInvoice.daysLeft(future) === 30 && TFInvoice.daysLeft(today) === 0);
+  check('Invoice', 'no deadline / budget / category on invoice', !/Deadline|Time left|Budget|Category|Preferred stack/.test(invText));
+  check('Invoice', 'one line item: the project', parsed.querySelectorAll('tbody tr').length === 1);
   check('Invoice', 'file name uses booking ID', bk && TFInvoice.fileName(bk) === `TechFusion-Invoice-${bk.id}.html`);
   const wa = bk ? TFInvoice.whatsappText(bk) : '';
-  check('Invoice', 'WhatsApp message has ID, name, project, deadline', bk && [bk.id, bk.fullName, bk.projectName, TFInvoice.fmtDate(future)].every((x) => wa.includes(x)));
+  check('Invoice', 'WhatsApp message has ID, name, project, type', bk && [bk.id, bk.fullName, bk.projectName, 'Type: Mini project'].every((x) => wa.includes(x)) && !wa.includes('Deadline'));
 
   window.fetch = realFetch;
   TFInvoice.navigate = realNavigate;

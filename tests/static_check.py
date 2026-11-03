@@ -104,19 +104,25 @@ for fid, form in forms.items():
     check(f"#{fid}: every field has a label", len(fields) == labels, f"{len(fields)} fields, {labels} labels")
 check("enquiry: name field is required", re.search(r'name="name"\s+required', forms.get("enquiry", "")) is not None)
 reg = forms.get("register-form", "")
-for field in ["fullName", "organisation", "email", "phone", "projectName", "category", "projectType", "deadline", "description", "agree"]:
+for field in ["fullName", "organisation", "email", "phone", "projectName", "projectType", "description", "agree"]:
     check(f"register: {field} is required", re.search(rf'name="{field}"[^>]*\brequired', reg) is not None)
 
 # Browsers compile pattern="" with the /v flag, where an unescaped "-" next to a class like [\s-] is a syntax error.
 bad_patterns = [p for p in re.findall(r'pattern="([^"]*)"', HTML) if re.search(r"\[[^\]]*(\\[sdw]-|-\\[sdw])", p)]
 check("input patterns are valid in modern browsers", not bad_patterns, str(bad_patterns))
 
+for gone in ["category", "deadline", "budget", "techStack", "extras"]:
+    check(f"register: removed field {gone}", f'name="{gone}"' not in reg)
+check("register: type is Mini or Mega only", re.findall(r'name="projectType" value="([^"]+)"', reg) == ["Mini project", "Mega project"])
+
 # 10b. Invoice page and shared script
 INV = (ROOT / "invoice.html").read_text(encoding="utf-8")
 INVJS = (ROOT / "invoice.js").read_text(encoding="utf-8")
 check("invoice.html loads invoice.js", 'src="invoice.js' in INV)
 check("index.html loads invoice.js before script.js", HTML.find('src="invoice.js') < HTML.find('src="script.js') and 'src="invoice.js' in HTML)
-check("invoice output escapes user input", INVJS.count("esc(b.") >= 20, f"{INVJS.count('esc(b.')} escaped fields")
+render = INVJS[INVJS.find("function renderBody"):INVJS.find("function renderDocument")]
+unescaped = re.findall(r"\$\{(b\.[\w.]+)\}", render)
+check(f"invoice escapes every booking value ({render.count('esc(b.')} escaped)", not unescaped and render.count("esc(b.") >= 10, str(unescaped))
 check("invoice page is not indexed by search engines", 'name="robots" content="noindex"' in INV)
 
 check("contact shows business email", 'href="mailto:techfusionteamwork@gmail.com"' in HTML)

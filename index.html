@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
@@ -427,70 +427,20 @@
 
           <div class="reg-block">
             <h3><span>2</span> Project details</h3>
-            <label>Project name *
+            <label>Project title *
               <input type="text" name="projectName" required maxlength="120" placeholder="e.g. Smart Irrigation using IoT">
             </label>
-            <div class="reg-row">
-              <label>Category *
-                <select name="category" required>
-                  <option value="">Choose…</option>
-                  <option>IoT / Embedded</option>
-                  <option>Robotics</option>
-                  <option>Web / Full-Stack</option>
-                  <option>Mobile App</option>
-                  <option>Machine Learning</option>
-                  <option>Deep Learning</option>
-                  <option>Generative AI</option>
-                  <option>Big Data / Data Science</option>
-                  <option>Other</option>
-                </select>
-              </label>
-              <label>Project type *
-                <select name="projectType" required>
-                  <option value="">Choose…</option>
-                  <option>Mini project</option>
-                  <option>Mega / Final-year project</option>
-                  <option>Industry project</option>
-                  <option>Internship / Training</option>
-                  <option>Research / Paper</option>
-                </select>
-              </label>
-            </div>
-            <div class="reg-row">
-              <label>Deadline *
-                <input type="date" name="deadline" required>
-              </label>
-              <label>Budget (optional)
-                <select name="budget">
-                  <option value="">Not sure yet</option>
-                  <option>Under ₹5,000</option>
-                  <option>₹5,000 – ₹10,000</option>
-                  <option>₹10,000 – ₹25,000</option>
-                  <option>₹25,000 – ₹50,000</option>
-                  <option>Above ₹50,000</option>
-                </select>
-              </label>
-            </div>
-            <label>Preferred tech stack
-              <input type="text" name="techStack" maxlength="120" placeholder="e.g. ESP32, React, Python — or leave blank">
+            <fieldset class="reg-type">
+              <legend>Project type *</legend>
+              <label class="pill"><input type="radio" name="projectType" value="Mini project" required> Mini project</label>
+              <label class="pill"><input type="radio" name="projectType" value="Mega project"> Mega project</label>
+            </fieldset>
+            <label class="reg-full">Project description *
+              <textarea name="description" rows="6" required minlength="20" maxlength="2000" placeholder="What should the project do? Main features, hardware/software needed, any reference…"></textarea>
+              <span class="char-count" aria-live="polite">0 / 2000</span>
             </label>
           </div>
         </div>
-
-        <label class="reg-full">Project description *
-          <textarea name="description" rows="5" required minlength="20" maxlength="2000" placeholder="What should the project do? Main features, hardware/software needed, any reference…"></textarea>
-          <span class="char-count" aria-live="polite">0 / 2000</span>
-        </label>
-
-        <fieldset class="reg-extras">
-          <legend>Also include</legend>
-          <label class="check"><input type="checkbox" name="extras" value="Project report"> Project report</label>
-          <label class="check"><input type="checkbox" name="extras" value="PPT presentation"> PPT presentation</label>
-          <label class="check"><input type="checkbox" name="extras" value="Source code"> Source code</label>
-          <label class="check"><input type="checkbox" name="extras" value="Hardware kit"> Hardware kit</label>
-          <label class="check"><input type="checkbox" name="extras" value="Deployment / hosting"> Deployment / hosting</label>
-          <label class="check"><input type="checkbox" name="extras" value="Viva / demo guidance"> Viva / demo guidance</label>
-        </fieldset>
 
         <label class="check reg-agree"><input type="checkbox" name="agree" required> I confirm these details are correct and Tech Fusion may contact me about this project.</label>
 
@@ -595,7 +545,7 @@
     <img alt="">
   </div>
 
-  <script src="invoice.js?v=4"></script>
-  <script src="script.js?v=4"></script>
+  <script src="invoice.js?v=5"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

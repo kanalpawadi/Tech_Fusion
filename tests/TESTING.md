@@ -103,3 +103,13 @@ New email tests (all with a fake email service — no real emails sent): one req
 3. Test booking 2 (`TF-261031-WCA1`, client email set to techfusionteamwork@gmail.com) → FormSubmit replied "The form was submitted successfully"; invoice page showed "Confirmation emailed". **Both the booking email and the client auto-reply arrived in the inbox** (confirmed by Tech Fusion).
 
 Activation was done while the site ran on `localhost`. When the site goes online at its own address, FormSubmit may send one more "Activate Form" email — click it once.
+
+## Round 4 — simpler registration form (2026-11-03)
+
+Project details now ask only for **project title**, **Mini / Mega project** and **description** (category, deadline, budget, tech stack and extras removed from the form, invoice, WhatsApp text and emails).
+
+| Suite | Width | Result |
+|---|---|---|
+| Static checks | — | 64 / 64 pass |
+| Browser components | 1280 / 768 px | 224 / 224 pass |
+| Browser components | 375 / 320 px | 229 / 229 pass |

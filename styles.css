@@ -493,8 +493,10 @@ h1, h2, h3 { font-family: var(--font-head); line-height: 1.15; }
 .register ::placeholder { color: #777; }
 .reg-full { position: relative; }
 .char-count { position: absolute; right: 12px; bottom: 10px; font-size: .75rem; color: #888; font-weight: 400; }
-.reg-extras { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 4px 0 22px; }
-.reg-extras legend { width: 100%; }
+.reg-type { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.reg-type legend { width: 100%; font-family: var(--font-body); font-size: .88rem; color: #e5e5e5; margin-bottom: 8px; }
+.reg-type[aria-invalid="true"] .pill { border-color: #ff6b6b; }
+.reg-agree { margin-top: 6px; }
 .check { display: inline-flex; align-items: flex-start; gap: 10px; cursor: pointer; color: #ddd; font-size: .95rem; }
 .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--yellow); flex-shrink: 0; }
 .reg-agree { margin-bottom: 20px; }

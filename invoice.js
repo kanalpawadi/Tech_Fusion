@@ -40,11 +40,6 @@
   const fmtDate = (iso) => new Date(iso + (iso.length === 10 ? 'T00:00:00' : ''))
     .toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  function daysLeft(deadline, from = new Date()) {
-    const start = new Date(from.getFullYear(), from.getMonth(), from.getDate());
-    return Math.round((new Date(deadline + 'T00:00:00') - start) / 86400000);
-  }
-
   function fileName(b) {
     return `TechFusion-Invoice-${b.id}.html`;
   }
@@ -56,8 +51,7 @@
       `Name: ${b.fullName} (${b.clientType})`,
       `${b.clientType === 'Industry' ? 'Company' : 'College'}: ${b.organisation}`,
       `Project: ${b.projectName}`,
-      `Category: ${b.category} · ${b.projectType}`,
-      `Deadline: ${fmtDate(b.deadline)}`,
+      `Type: ${b.projectType}`,
       'Please confirm my booking.',
     ].join('\n');
   }
@@ -70,8 +64,7 @@
       '',
       `Booking ID: ${b.id}`,
       `Project: ${b.projectName}`,
-      `Category: ${b.category} · ${b.projectType}`,
-      `Deadline: ${fmtDate(b.deadline)}`,
+      `Type: ${b.projectType}`,
       '',
       'View or download your booking invoice here:',
       invoiceUrl,
@@ -100,12 +93,7 @@
       Phone: b.phone,
       City: b.city || '-',
       Project: b.projectName,
-      Category: b.category,
       'Project type': b.projectType,
-      Deadline: fmtDate(b.deadline),
-      Budget: b.budget || 'Not sure yet',
-      'Tech stack': b.techStack || '-',
-      Extras: b.extras.length ? b.extras.join(', ') : '-',
       Description: b.description,
       'Invoice link': invoiceUrl,
     };
@@ -189,12 +177,7 @@
 
   function renderBody(b) {
     const isIndustry = b.clientType === 'Industry';
-    const days = daysLeft(b.deadline, new Date(b.createdAt));
-    const extras = b.extras && b.extras.length ? b.extras : [];
-    const rows = [
-      `<tr><td>1</td><td><b>${esc(b.projectName)}</b><small>${esc(b.category)} · ${esc(b.projectType)}${b.techStack ? ' · ' + esc(b.techStack) : ''}</small></td><td>As per quote</td></tr>`,
-      ...extras.map((x, i) => `<tr><td>${i + 2}</td><td>${esc(x)}</td><td>Included in quote</td></tr>`),
-    ].join('');
+    const rows = `<tr><td>1</td><td><b>${esc(b.projectName)}</b><small>${esc(b.projectType)}</small></td><td>As per quote</td></tr>`;
 
     return `
     <div class="tfi">
@@ -216,8 +199,8 @@
         <div class="tfi-meta">
           <div><span>Booking ID</span><strong>${esc(b.id)}</strong></div>
           <div><span>Issued on</span><strong>${esc(fmtDate(b.createdAt.slice(0, 10)))}</strong></div>
-          <div><span>Deadline</span><strong>${esc(fmtDate(b.deadline))}</strong></div>
-          <div><span>Time left</span><strong>${days > 0 ? `${days} day${days === 1 ? '' : 's'}` : days === 0 ? 'Due today' : 'Past due'}</strong></div>
+          <div><span>Project type</span><strong>${esc(b.projectType)}</strong></div>
+          <div><span>Status</span><strong>Pending</strong></div>
         </div>
 
         <div class="tfi-cols">
@@ -233,10 +216,7 @@
           <div class="tfi-box">
             <h3>Project</h3>
             <p class="big">${esc(b.projectName)}</p>
-            <p>Category: ${esc(b.category)}</p>
             <p>Type: ${esc(b.projectType)}</p>
-            ${b.techStack ? `<p>Preferred stack: ${esc(b.techStack)}</p>` : ''}
-            <p>Budget: ${esc(b.budget || 'To be discussed')}</p>
           </div>
         </div>
 
@@ -250,7 +230,7 @@
           <tbody>${rows}</tbody>
           <tfoot><tr><td></td><td style="text-align:right">Total</td><td class="tot">To be confirmed</td></tr></tfoot>
         </table>
-        <p class="tfi-note">This is a booking invoice. The final amount will be shared by Tech Fusion after reviewing your requirements${b.budget ? `, keeping your budget (${esc(b.budget)}) in mind` : ''}.</p>
+        <p class="tfi-note">This is a booking invoice. The final amount will be shared by Tech Fusion after reviewing your requirements.</p>
 
         <div class="tfi-steps">
           <div><b>We review</b><p>Our team studies your requirements within 24 hours.</p></div>
@@ -298,5 +278,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
 
-  window.TFInvoice = { BUSINESS, MAIL_ENDPOINT, CSS, esc, encode, decode, newBookingId, daysLeft, fmtDate, fileName, whatsappText, clientEmailText, sendEmails, navigate, renderBody, renderDocument, download };
+  window.TFInvoice = { BUSINESS, MAIL_ENDPOINT, CSS, esc, encode, decode, newBookingId, fmtDate, fileName, whatsappText, clientEmailText, sendEmails, navigate, renderBody, renderDocument, download };
 })();

@@ -73,13 +73,6 @@ document.querySelectorAll('.filter').forEach((btn) =>
 const reg = document.getElementById('register-form');
 const regError = reg.querySelector('.form-error');
 const charCount = reg.querySelector('.char-count');
-const todayISO = () => {
-  const d = new Date();
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-};
-
-reg.deadline.min = todayISO();
-
 reg.description.addEventListener('input', () => {
   charCount.textContent = `${reg.description.value.length} / 2000`;
 });
@@ -91,6 +84,10 @@ reg.querySelectorAll('input[name="clientType"]').forEach((r) =>
     reg.querySelectorAll('[data-student]').forEach((el) => { el.hidden = industry; });
     reg.querySelectorAll('[data-industry]').forEach((el) => { el.hidden = !industry; });
   })
+);
+
+reg.querySelectorAll('input[name="projectType"]').forEach((r) =>
+  r.addEventListener('change', () => reg.querySelector('.reg-type').removeAttribute('aria-invalid'))
 );
 
 function regFail(field, message) {
@@ -112,19 +109,22 @@ function validateRegistration(f) {
     ['organisation', f.clientType.value === 'Industry' ? 'Please enter your company name.' : 'Please enter your college name.'],
     ['email', 'Please enter your email.'],
     ['phone', 'Please enter your phone / WhatsApp number.'],
-    ['projectName', 'Please enter the project name.'],
-    ['category', 'Please choose a category.'],
-    ['projectType', 'Please choose the project type.'],
-    ['deadline', 'Please choose a deadline.'],
-    ['description', 'Please describe your project.'],
+    ['projectName', 'Please enter the project title.'],
   ];
   for (const [name, msg] of required) {
     if (!f[name].value.trim()) return regFail(f[name], msg);
   }
+  if (!f.projectType.value) {
+    const group = f.querySelector('.reg-type');
+    group.setAttribute('aria-invalid', 'true');
+    regFail(null, 'Please choose Mini project or Mega project.');
+    f.projectType[0].focus();
+    return false;
+  }
+  if (!f.description.value.trim()) return regFail(f.description, 'Please describe your project.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) return regFail(f.email, 'Please enter a valid email address.');
   const digits = f.phone.value.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
   if (!/^[6-9]\d{9}$/.test(digits)) return regFail(f.phone, 'Please enter a valid 10-digit Indian mobile number.');
-  if (f.deadline.value < todayISO()) return regFail(f.deadline, 'The deadline cannot be in the past.');
   if (f.description.value.trim().length < 20) return regFail(f.description, 'Please add a little more detail (at least 20 characters).');
   if (!f.agree.checked) return regFail(f.agree, 'Please confirm your details are correct.');
   return true;
@@ -150,13 +150,8 @@ reg.addEventListener('submit', async (e) => {
     phone: `+91 ${phone.slice(0, 5)} ${phone.slice(5)}`,
     city: v('city'),
     projectName: v('projectName'),
-    category: v('category'),
-    projectType: v('projectType'),
-    deadline: v('deadline'),
-    budget: v('budget'),
-    techStack: v('techStack'),
+    projectType: f.projectType.value,
     description: v('description'),
-    extras: [...f.querySelectorAll('input[name="extras"]:checked')].map((c) => c.value),
   };
 
   try {
