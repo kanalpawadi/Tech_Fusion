@@ -7,4 +7,5 @@ rm -rf dist
 mkdir -p dist/assets
 cp index.html invoice.html styles.css script.js invoice.js favicon.ico apple-touch-icon.png dist/
 cp -r assets/photos assets/instagram dist/assets/
+cp assets/*.jpg dist/assets/ 2>/dev/null || true
 echo "Built dist/ ($(find dist -type f | wc -l) files)"

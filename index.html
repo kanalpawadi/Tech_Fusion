@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -22,6 +22,10 @@
         <span class="logo-small">Tech</span>
         <span class="logo-big">FUSI<span class="logo-o">O</span>N</span>
       </a>
+      <div class="nav-status">
+        <span class="nav-status-dot"></span>
+        <span>Lab Open 9am–9pm</span>
+      </div>
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -38,20 +42,47 @@
 
   <!-- Hero -->
   <section class="hero">
+    <canvas id="hero-3d-canvas" class="hero-canvas" aria-hidden="true"></canvas>
     <div class="hero-bg" style="background-image:url('assets/photos/photo-01.jpg')"></div>
     <div class="container hero-content">
-      <p class="eyebrow">Ichalkaranji · Hardware + Software</p>
-      <h1>Turning ideas into <span class="hl">reality.</span></h1>
-      <p class="lead">Mini &amp; mega projects for B.Tech, diploma and industry — from Arduino and IoT to full-stack apps, Machine Learning, Deep Learning and Generative AI. Plus industrial training and internships in our own lab.</p>
-      <div class="hero-cta">
-        <a href="https://wa.me/917507190468?text=Hi%20Tech%20Fusion%2C%20I%20want%20to%20enquire%20about%20a%20project." class="btn btn-yellow" target="_blank" rel="noopener">WhatsApp Us</a>
-        <a href="#services" class="btn btn-outline">Explore Services</a>
+      <div class="hero-grid">
+        <div class="hero-main">
+          <div class="hero-status-pill">
+            <span class="status-pulse"></span>
+            <span>Ichalkaranji Engineering Lab · Open Daily 9 AM – 9 PM</span>
+          </div>
+          <p class="eyebrow">Ichalkaranji · Hardware + Software</p>
+          <h1>Turning ideas into <span class="hl">reality.</span></h1>
+          <p class="lead">Mini &amp; mega projects for B.Tech, diploma and industry — from Arduino and IoT to full-stack apps, Machine Learning, Deep Learning and Generative AI. Plus industrial training and internships in our own lab.</p>
+          <div class="hero-cta">
+            <a href="https://wa.me/917507190468?text=Hi%20Tech%20Fusion%2C%20I%20want%20to%20enquire%20about%20a%20project." class="btn btn-yellow" target="_blank" rel="noopener">WhatsApp Us</a>
+            <a href="#services" class="btn btn-outline">Explore Services</a>
+          </div>
+          <ul class="hero-badges">
+            <li><strong>5.0 ★</strong> Google rating</li>
+            <li><strong>All tech stacks</strong> Hardware &amp; software</li>
+            <li><strong>9 am – 9 pm</strong> Open all 7 days</li>
+          </ul>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-3d-card" data-tilt>
+            <div class="hero-card-glow"></div>
+            <div class="hero-card-frame">
+              <img src="assets/hero-3d-render.jpg" alt="3D engineering workstation with custom IoT hardware and robotic prototypes" class="hero-render-img" loading="eager">
+              <div class="hero-card-overlay">
+                <div class="hero-card-tag hero-card-tag-top">
+                  <span class="tag-icon">⚡</span>
+                  <span>Custom Hardware &amp; AI Edge Nodes</span>
+                </div>
+                <div class="hero-card-tag hero-card-tag-bottom">
+                  <strong>Built in Lab · Zero Templates</strong>
+                  <span class="tag-sub">Complete Viva &amp; Black Book Included</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <ul class="hero-badges">
-        <li><strong>5.0 ★</strong> Google rating</li>
-        <li><strong>All tech stacks</strong> Hardware &amp; software</li>
-        <li><strong>9 am – 9 pm</strong> Open all 7 days</li>
-      </ul>
     </div>
   </section>
 
@@ -73,35 +104,35 @@
       </div>
 
       <div class="cards">
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></svg>
           </div>
           <h3>Electronics &amp; Embedded</h3>
           <p>Arduino, ESP32, Raspberry Pi, sensors, PCB design, power supplies and automation circuits.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/><path d="M1.5 9a15 15 0 0 1 21 0"/></svg>
           </div>
           <h3>IoT &amp; Robotics</h3>
           <p>Smart home, smart agriculture, rain alerts, object counters, rovers, robotic arms and RC builds.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
           </div>
           <h3>Software &amp; Full-Stack</h3>
           <p>Web apps, mobile apps, desktop software and APIs in every major tech stack — MERN, Java, Python, PHP, Flutter and more.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 7l3 4M7 17l3-4M14 11l3-4M14 13l3 4"/></svg>
           </div>
           <h3>Machine Learning &amp; Deep Learning</h3>
           <p>Prediction models, classification, computer vision, NLP, CNNs, RNNs and data-science dashboards.</p>
         </article>
-        <article class="card card-featured">
+        <article class="card card-featured" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>
           </div>
@@ -109,28 +140,28 @@
           <p>LLM chatbots, RAG apps over your documents, AI agents, image generation and prompt-engineered tools.</p>
           <span class="tag">New</span>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>
           </div>
           <h3>Industry Projects</h3>
           <p>Custom automation, monitoring systems and software solutions built for small businesses and industries.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
           </div>
           <h3>B.Tech / Diploma / MCA</h3>
           <p>Mini &amp; mega final-year projects with report, PPT, documentation and viva preparation.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
           </div>
           <h3>Training &amp; Internship</h3>
           <p>Hands-on industrial training and internships with certificate — learn by building real projects.</p>
         </article>
-        <article class="card">
+        <article class="card" data-tilt>
           <div class="card-icon">
             <svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg>
           </div>
@@ -151,37 +182,37 @@
       </div>
 
       <div class="stack-grid">
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>Hardware &amp; IoT</h3>
           <ul class="chips">
             <li>Arduino</li><li>ESP32 / ESP8266</li><li>Raspberry Pi</li><li>NodeMCU</li><li>Sensors &amp; Modules</li><li>GSM / GPS</li><li>RFID</li><li>Blynk</li><li>Firebase IoT</li><li>PCB Design</li>
           </ul>
         </div>
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>Web &amp; Full-Stack</h3>
           <ul class="chips">
             <li>HTML / CSS / JS</li><li>React</li><li>Next.js</li><li>Node.js</li><li>Express</li><li>MongoDB</li><li>MySQL</li><li>PHP</li><li>Django</li><li>Flask</li><li>Spring Boot</li><li>.NET</li>
           </ul>
         </div>
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>Mobile &amp; Desktop</h3>
           <ul class="chips">
             <li>Android (Java / Kotlin)</li><li>Flutter</li><li>React Native</li><li>Java Swing</li><li>Python Tkinter</li><li>C / C++</li>
           </ul>
         </div>
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>ML &amp; Deep Learning</h3>
           <ul class="chips">
             <li>Python</li><li>NumPy / Pandas</li><li>Scikit-learn</li><li>TensorFlow</li><li>Keras</li><li>PyTorch</li><li>OpenCV</li><li>YOLO</li><li>NLP</li>
           </ul>
         </div>
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>Generative AI</h3>
           <ul class="chips">
             <li>LLM APIs</li><li>LangChain</li><li>RAG</li><li>Vector DBs</li><li>Hugging Face</li><li>AI Agents</li><li>Stable Diffusion</li><li>Prompt Engineering</li>
           </ul>
         </div>
-        <div class="stack-group">
+        <div class="stack-group" data-tilt>
           <h3>Cloud &amp; Tools</h3>
           <ul class="chips">
             <li>Firebase</li><li>AWS</li><li>Git &amp; GitHub</li><li>Docker</li><li>Streamlit</li><li>Power BI</li>
@@ -210,97 +241,97 @@
       </div>
 
       <div class="projects">
-        <article class="project" data-cat="ai web">
+        <article class="project" data-cat="ai web" data-tilt>
           <div class="project-top"><span class="project-cat">AI · Web</span><span class="project-badge">Final year</span></div>
           <h3>AgroIntel</h3>
           <p>Organic fruit detection with two MobileNetV2 models, plus a marketplace website where every scan is saved.</p>
           <ul class="project-tech"><li>React</li><li>Node.js</li><li>PostgreSQL</li><li>FastAPI</li><li>TensorFlow</li></ul>
         </article>
-        <article class="project" data-cat="genai web">
+        <article class="project" data-cat="genai web" data-tilt>
           <div class="project-top"><span class="project-cat">Gen AI · Web</span></div>
           <h3>Aegis — AI Personal Mentor</h3>
           <p>Gamified study companion with four AI mentors, a learning map, planner with habit streaks, flashcards, quizzes and notes.</p>
           <ul class="project-tech"><li>React</li><li>Vite</li><li>Gemini API</li></ul>
         </article>
-        <article class="project" data-cat="data ai">
+        <article class="project" data-cat="data ai" data-tilt>
           <div class="project-top"><span class="project-cat">Big Data · ML</span><span class="project-badge">Final year</span></div>
           <h3>Amazon Review Analytics</h3>
           <p>Sentiment analysis, fake-review detection and product recommendation on 43.9 M Amazon ratings, with explainable AI.</p>
           <ul class="project-tech"><li>PySpark</li><li>Spark MLlib</li><li>Hadoop HDFS</li><li>Hive</li><li>React</li></ul>
         </article>
-        <article class="project" data-cat="ai iot">
+        <article class="project" data-cat="ai iot" data-tilt>
           <div class="project-top"><span class="project-cat">AI · IoT</span></div>
           <h3>Chicks Monitoring System</h3>
           <p>Camera-based poultry farm monitor that detects chicks and threats like snakes in real time and raises alerts.</p>
           <ul class="project-tech"><li>YOLOv8</li><li>OpenCV</li><li>CLIP</li><li>Flask</li></ul>
         </article>
-        <article class="project" data-cat="ai genai web">
+        <article class="project" data-cat="ai genai web" data-tilt>
           <div class="project-top"><span class="project-cat">Deep Learning</span><span class="project-badge">SIH 2026</span></div>
           <h3>Demand IQ — Inventory Forecasting</h3>
           <p>Forecasts product demand with a stacked ensemble, recommends reorder points, flags anomalies and explains every prediction.</p>
           <ul class="project-tech"><li>LSTM</li><li>XGBoost</li><li>Prophet</li><li>SHAP</li><li>FastAPI</li><li>Groq</li></ul>
         </article>
-        <article class="project" data-cat="ai iot">
+        <article class="project" data-cat="ai iot" data-tilt>
           <div class="project-top"><span class="project-cat">Deep Learning · IoT</span></div>
           <h3>Fruit Classification System</h3>
           <p>Classifies fruits from a live camera with a trained CNN and drives an ESP32 sorter over serial / MQTT.</p>
           <ul class="project-tech"><li>TensorFlow</li><li>Keras</li><li>OpenCV</li><li>Flask</li><li>ESP32</li></ul>
         </article>
-        <article class="project" data-cat="iot web">
+        <article class="project" data-cat="iot web" data-tilt>
           <div class="project-top"><span class="project-cat">IoT</span></div>
           <h3>Smart Gas Monitoring</h3>
           <p>ESP32 + MQ-135 gas sensor with LCD, buzzer and GSM SMS alerts, streaming live readings to a web dashboard.</p>
           <ul class="project-tech"><li>ESP32</li><li>MQ-135</li><li>SIM800L</li><li>Supabase</li><li>React</li></ul>
         </article>
-        <article class="project" data-cat="iot genai">
+        <article class="project" data-cat="iot genai" data-tilt>
           <div class="project-top"><span class="project-cat">IoT · Gen AI</span><span class="project-badge">B.Tech major</span></div>
           <h3>Remote Patient Health Monitoring</h3>
           <p>ESP32 vitals sensors, fall detection and a rule engine, with Generative AI explaining each alert in plain language.</p>
           <ul class="project-tech"><li>ESP32</li><li>MAX30102</li><li>FastAPI</li><li>Supabase</li><li>React</li><li>LLM</li></ul>
         </article>
-        <article class="project" data-cat="genai web">
+        <article class="project" data-cat="genai web" data-tilt>
           <div class="project-top"><span class="project-cat">Gen AI · Voice</span></div>
           <h3>MediLing — Healthcare Conversation AI</h3>
           <p>Multilingual voice patient-intake in English, Hindi, Kannada and code-mixed speech, with structured data extraction.</p>
           <ul class="project-tech"><li>FastAPI</li><li>React</li><li>TypeScript</li><li>Speech-to-text</li><li>LLM</li></ul>
         </article>
-        <article class="project" data-cat="web">
+        <article class="project" data-cat="web" data-tilt>
           <div class="project-top"><span class="project-cat">Web App</span></div>
           <h3>Mess Tracker</h3>
           <p>Daily mess meal tracker with a calendar view, history, dashboard stats and editable entries.</p>
           <ul class="project-tech"><li>React</li><li>Tailwind CSS</li><li>Vite</li></ul>
         </article>
-        <article class="project" data-cat="genai">
+        <article class="project" data-cat="genai" data-tilt>
           <div class="project-top"><span class="project-cat">Gen AI · NLP</span></div>
           <h3>AI Paraphrasing Tool</h3>
           <p>LLM-powered paraphraser with semantic search over saved text using vector embeddings.</p>
           <ul class="project-tech"><li>Streamlit</li><li>Groq LLM</li><li>ChromaDB</li><li>Sentence Transformers</li></ul>
         </article>
-        <article class="project" data-cat="ai iot">
+        <article class="project" data-cat="ai iot" data-tilt>
           <div class="project-top"><span class="project-cat">AI · IoT</span></div>
           <h3>Pothole Watch</h3>
           <p>Detects potholes from an ESP32-CAM video stream with YOLOv8 and pins each one, with GPS, on a live web map.</p>
           <ul class="project-tech"><li>YOLOv8</li><li>ESP32-CAM</li><li>Flask-SocketIO</li><li>Leaflet</li></ul>
         </article>
-        <article class="project" data-cat="web iot">
+        <article class="project" data-cat="web iot" data-tilt>
           <div class="project-top"><span class="project-cat">Web · GPS</span></div>
           <h3>Smart School Bus Management</h3>
           <p>Live GPS bus tracking with separate admin, driver and parent apps for routes, drivers and students.</p>
           <ul class="project-tech"><li>Next.js</li><li>Supabase</li><li>Geolocation</li></ul>
         </article>
-        <article class="project" data-cat="iot web">
+        <article class="project" data-cat="iot web" data-tilt>
           <div class="project-top"><span class="project-cat">IoT</span></div>
           <h3>Smart Streetlight System</h3>
           <p>IoT street-light monitoring with a live web dashboard and charts for status and energy use.</p>
           <ul class="project-tech"><li>Next.js</li><li>Supabase</li><li>Recharts</li><li>IoT</li></ul>
         </article>
-        <article class="project" data-cat="iot ai">
+        <article class="project" data-cat="iot ai" data-tilt>
           <div class="project-top"><span class="project-cat">IoT · ML</span></div>
           <h3>Water Quality Monitoring</h3>
           <p>ESP32 with TDS and temperature probes, an ML service that predicts water quality, and a live dashboard.</p>
           <ul class="project-tech"><li>ESP32</li><li>TDS sensor</li><li>Python ML</li><li>Supabase</li><li>React</li></ul>
         </article>
-        <article class="project" data-cat="web">
+        <article class="project" data-cat="web" data-tilt>
           <div class="project-top"><span class="project-cat">Website</span></div>
           <h3>Developer Portfolio Websites</h3>
           <p>Modern, responsive personal portfolio sites to showcase skills, projects and résumés.</p>
@@ -328,6 +359,73 @@
         <li><span class="step-num">04</span><h3>Test</h3><p>Full testing so it works on the day of your demo.</p></li>
         <li><span class="step-num">05</span><h3>Deliver</h3><p>Project, source code, report, PPT and viva guidance.</p></li>
       </ol>
+    </div>
+  </section>
+
+  <!-- 3D Hardware & AI Prototyping Showcase -->
+  <section class="section section-prototype" id="prototype">
+    <div class="container">
+      <div class="section-head section-head-center">
+        <p class="eyebrow">Hardware-Software Co-Design</p>
+        <h2>From breadboard to <span class="hl">industry-ready prototype.</span></h2>
+        <p>We don't just write code or copy simulated circuits. We wire, solder, calibrate, and program physical hardware right in our lab with you.</p>
+      </div>
+
+      <div class="prototype-showcase">
+        <div class="prototype-card" data-tilt>
+          <div class="prototype-visual">
+            <div class="prototype-glow"></div>
+            <img src="assets/iot-3d-showcase.jpg" alt="3D prototype render of IoT AI edge device built at Tech Fusion" class="prototype-img" loading="lazy">
+            <div class="prototype-float-badge prototype-badge-1">
+              <span class="badge-dot"></span> Custom PCB &amp; Microcontroller
+            </div>
+            <div class="prototype-float-badge prototype-badge-2">
+              <span class="badge-dot cyan"></span> Edge AI Model Inference
+            </div>
+          </div>
+          <div class="prototype-content">
+            <div class="prototype-header">
+              <span class="prototype-kicker">Lab Guarantee</span>
+              <h3>What Comes With Every Tech Fusion Project</h3>
+              <p>When you present your final-year or semester project, you will understand every line of source code, every resistor value, and every architecture decision.</p>
+            </div>
+            <div class="prototype-features">
+              <div class="feat-card">
+                <div class="feat-icon">⚡</div>
+                <div class="feat-text">
+                  <h4>Working Physical Model</h4>
+                  <p>Assembled, calibrated, and rigorously tested in our Ichalkaranji lab so it performs reliably on demo day.</p>
+                </div>
+              </div>
+              <div class="feat-card">
+                <div class="feat-icon">💻</div>
+                <div class="feat-text">
+                  <h4>Clean Source Code &amp; APIs</h4>
+                  <p>Well-commented code in GitHub repositories, configured with local setups, databases, and model weights.</p>
+                </div>
+              </div>
+              <div class="feat-card">
+                <div class="feat-icon">📄</div>
+                <div class="feat-text">
+                  <h4>IEEE Synopsis &amp; Black Book</h4>
+                  <p>Complete project report, high-resolution circuit schematics, block diagrams, and PPT slides formatted to your college norms.</p>
+                </div>
+              </div>
+              <div class="feat-card">
+                <div class="feat-icon">🎓</div>
+                <div class="feat-text">
+                  <h4>1-on-1 Viva Coaching</h4>
+                  <p>We grill you on common examiner questions, circuit pinouts, and code logic until you answer with total confidence.</p>
+                </div>
+              </div>
+            </div>
+            <div class="prototype-cta-row">
+              <a href="#register" class="btn btn-yellow">Register Your Project Now</a>
+              <a href="https://wa.me/917507190468?text=Hi%20Tech%20Fusion%2C%20I%20want%20to%20discuss%20a%20project%20idea." class="btn btn-outline" target="_blank" rel="noopener">Discuss on WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -546,6 +644,6 @@
   </div>
 
   <script src="invoice.js?v=8"></script>
-  <script src="script.js?v=9"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>

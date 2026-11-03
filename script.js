@@ -205,3 +205,191 @@ const io = new IntersectionObserver((entries) => {
 revealEls.forEach((el) => io.observe(el));
 
 document.getElementById('year').textContent = new Date().getFullYear();
+
+
+// 3D Card Tilt on Hover
+function init3DTilt() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  const tiltEls = document.querySelectorAll('[data-tilt]');
+  tiltEls.forEach((el) => {
+    let ticking = false;
+    let rect = null;
+
+    const onMouseEnter = () => {
+      rect = el.getBoundingClientRect();
+      el.style.transition = 'transform .1s ease-out';
+    };
+
+    const onMouseMove = (e) => {
+      if (!rect) rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const rx = -y * 8;
+          const ry = x * 8;
+          el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    const onMouseLeave = () => {
+      rect = null;
+      el.style.transition = 'transform .35s ease';
+      el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+    };
+
+    el.addEventListener('mouseenter', onMouseEnter);
+    el.addEventListener('mousemove', onMouseMove);
+    el.addEventListener('mouseleave', onMouseLeave);
+  });
+}
+init3DTilt();
+
+// Interactive 3D Electronic Nodes Canvas in Hero
+function initHero3DCanvas() {
+  const canvas = document.getElementById('hero-3d-canvas');
+  if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = 0, height = 0;
+  let isVisible = true;
+  let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+
+  const resize = () => {
+    width = canvas.width = canvas.parentElement.offsetWidth;
+    height = canvas.height = canvas.parentElement.offsetHeight;
+  };
+  window.addEventListener('resize', resize);
+  resize();
+
+  const nodeCount = 36;
+  const nodes = [];
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push({
+      x: (Math.random() - 0.5) * 550,
+      y: (Math.random() - 0.5) * 450,
+      z: (Math.random() - 0.5) * 450,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      vz: (Math.random() - 0.5) * 0.35,
+      color: Math.random() > 0.45 ? '#ffd21f' : '#00e5ff',
+      isChip: Math.random() > 0.65
+    });
+  }
+
+  const heroSection = document.querySelector('.hero');
+  if (heroSection) {
+    heroSection.addEventListener('mousemove', (e) => {
+      const r = heroSection.getBoundingClientRect();
+      mouse.targetX = ((e.clientX - r.left) / r.width - 0.5) * 0.6;
+      mouse.targetY = ((e.clientY - r.top) / r.height - 0.5) * 0.6;
+    });
+  }
+
+  const obs = new IntersectionObserver(([entry]) => {
+    isVisible = entry.isIntersecting;
+  }, { threshold: 0.05 });
+  obs.observe(heroSection);
+
+  let rotX = 0, rotY = 0;
+
+  function loop() {
+    if (!isVisible) {
+      requestAnimationFrame(loop);
+      return;
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    mouse.x += (mouse.targetX - mouse.x) * 0.05;
+    mouse.y += (mouse.targetY - mouse.y) * 0.05;
+
+    rotY += 0.002 + mouse.x * 0.008;
+    rotX += 0.001 - mouse.y * 0.008;
+
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const fov = 420;
+    const cx = width * 0.65;
+    const cy = height * 0.48;
+
+    const projected = [];
+
+    for (let i = 0; i < nodeCount; i++) {
+      const n = nodes[i];
+      n.x += n.vx;
+      n.y += n.vy;
+      n.z += n.vz;
+
+      if (n.x < -280 || n.x > 280) n.vx *= -1;
+      if (n.y < -230 || n.y > 230) n.vy *= -1;
+      if (n.z < -230 || n.z > 230) n.vz *= -1;
+
+      const x1 = n.x * cosY - n.z * sinY;
+      const z1 = n.z * cosY + n.x * sinY;
+      const y1 = n.y * cosX - z1 * sinX;
+      const z2 = z1 * cosX + n.y * sinX;
+
+      const scale = fov / (fov + z2 + 300);
+      const px = cx + x1 * scale;
+      const py = cy + y1 * scale;
+      const alpha = Math.max(0.08, Math.min(0.85, (z2 + 250) / 500));
+
+      projected.push({ px, py, scale, alpha, color: n.color, isChip: n.isChip, z: z2 });
+    }
+
+    for (let i = 0; i < projected.length; i++) {
+      for (let j = i + 1; j < projected.length; j++) {
+        const p1 = projected[i];
+        const p2 = projected[j];
+        const dx = p1.px - p2.px;
+        const dy = p1.py - p2.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 110) {
+          const lineAlpha = (1 - dist / 110) * 0.22 * Math.min(p1.alpha, p2.alpha);
+          ctx.beginPath();
+          ctx.strokeStyle = p1.color === '#00e5ff'
+            ? `rgba(0, 229, 255, ${lineAlpha})`
+            : `rgba(255, 210, 31, ${lineAlpha})`;
+          ctx.lineWidth = p1.isChip || p2.isChip ? 1.4 : 0.8;
+          ctx.moveTo(p1.px, p1.py);
+          ctx.lineTo(p2.px, p2.py);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (let i = 0; i < projected.length; i++) {
+      const p = projected[i];
+      if (p.px < -20 || p.px > width + 20 || p.py < -20 || p.py > height + 20) continue;
+
+      if (p.isChip) {
+        const size = Math.max(3, 7 * p.scale);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fillRect(p.px - size / 2, p.py - size / 2, size, size);
+      } else {
+        const r = Math.max(1.5, 3.5 * p.scale);
+        ctx.beginPath();
+        ctx.arc(p.px, p.py, r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
+}
+initHero3DCanvas();
