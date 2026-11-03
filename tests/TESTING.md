@@ -126,3 +126,7 @@ FormSubmit had a full outage (Cloudflare 522 on every page, from two networks). 
 | Invoice page, backup mode | 320 px | 14 / 14 pass |
 
 New tests (fake services only): backup not used when FormSubmit works; FormSubmit 522 → Web3Forms with access key, "(backup)" subject, client reply-to, all details, no FormSubmit-only fields; both failing or offline → "failed"; no key → backup skipped.
+
+### Live backup test (2026-11-03)
+
+Test booking `TF-261103-11TJ` from https://techfusion-ichalkaranji.netlify.app while FormSubmit was down: FormSubmit timed out after 8 s, Web3Forms accepted it in 1.6 s, invoice page showed the "received your booking" message, and **the "(backup)" email arrived in techfusionteamwork@gmail.com** (confirmed by Tech Fusion).
