@@ -61,6 +61,33 @@ export async function run() {
     check('Header', 'nav links visible on desktop', navLinks.every(isVisible));
   }
 
+  // ---------- Diwali banner ----------
+  const dw = $('#diwali');
+  if (dw) {
+    check('Diwali', 'season check: on during festival', isDiwaliSeason(new Date('2026-11-08T20:00:00')) === true);
+    check('Diwali', 'season check: on until end of 12 Nov', isDiwaliSeason(new Date('2026-11-12T23:59:00')) === true);
+    check('Diwali', 'season check: off from 13 Nov', isDiwaliSeason(new Date('2026-11-13T00:00:01')) === false);
+    const shouldShow = isDiwaliSeason() && (() => { try { return sessionStorage.getItem('tf-diwali-closed') !== '1'; } catch { return true; } })();
+    check('Diwali', `banner ${shouldShow ? 'shown' : 'hidden'} today as expected`, isVisible(dw) === shouldShow);
+    if (shouldShow) {
+      check('Diwali', 'greeting text', dw.textContent.includes('Happy') && dw.textContent.includes('Diwali') && dw.textContent.includes('शुभ दीपावली') && dw.textContent.includes('Team Tech Fusion'));
+      const cv = dw.querySelector('canvas');
+      check('Diwali', 'fireworks canvas covers the banner, not stretched', cv && Math.abs(cv.getBoundingClientRect().height - dw.clientHeight) < 1 && Math.abs(cv.height / cv.getBoundingClientRect().height - cv.width / cv.getBoundingClientRect().width) < 0.05 && cv.width > 0);
+      check('Diwali', 'canvas hidden from screen readers', cv.getAttribute('aria-hidden') === 'true');
+      check('Diwali', 'banner sits right under the menu', dw.previousElementSibling === $('.nav'));
+      check('Diwali', 'title is large and white/gold', parseFloat(getComputedStyle($('.diwali-title')).fontSize) >= 30);
+      const close = dw.querySelector('.diwali-close');
+      check('Diwali', 'close button labelled and tappable', close.getAttribute('aria-label') && close.offsetWidth >= 44 && close.offsetHeight >= 44);
+      close.click(); await wait();
+      let stored = null; try { stored = sessionStorage.getItem('tf-diwali-closed'); } catch {}
+      check('Diwali', 'close button hides the banner', !isVisible(dw));
+      check('Diwali', 'stays closed while browsing (session)', stored === '1');
+      // put it back for the rest of the tests / the visitor
+      try { sessionStorage.removeItem('tf-diwali-closed'); } catch {}
+      dw.hidden = false;
+    }
+  }
+
   // ---------- Hero ----------
   const hero = $('.hero');
   check('Hero', 'heading text', $('.hero h1').textContent.includes('Turning ideas into'));

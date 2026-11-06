@@ -151,3 +151,14 @@ await import('/tests/responsive_audit.js?v=' + Date.now()).then(m => m.audit())
 7. Logo tap area 36 px → 44 px; "New" tag and invoice labels raised to 12 px; "I confirm" checkbox row given a bigger tap area.
 8. Invoice: on 280 px phones the info box stuck out → one column below 380 px.
 9. After the form was cleared (or restored by the Back button), labels could say "Company name" with Student selected and the counter showed old text length → labels and counter now always match the form.
+
+## Round 7 — Diwali greeting (2026-11-06)
+
+Banner under the menu: "शुभ दीपावली · Happy Diwali" with looping fireworks (canvas), shimmering gold title, flickering diyas and twinkling string lights. Shown until the end of **12 Nov 2026** (`DIWALI_LAST_DAY` in `script.js`), closable (stays closed for the visit), animation pauses when scrolled off-screen, and is still (no animation) for visitors who turn on "reduce motion".
+
+| Suite | Width | Result |
+|---|---|---|
+| Static checks | — | 74 / 74 pass |
+| Browser components | 1280 / 768 px | 260 / 260 pass |
+| Browser components | 360 px | 265 / 265 pass |
+| Layout audit | 18 sizes, 280 px – 1440 px | all OK; close button never covers text |

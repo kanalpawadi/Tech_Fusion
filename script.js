@@ -401,3 +401,148 @@ function initHero3DCanvas() {
   requestAnimationFrame(loop);
 }
 initHero3DCanvas();
+
+// Diwali greeting: shown until the end of DIWALI_LAST_DAY (visitor's local time), with looping fireworks
+const DIWALI_LAST_DAY = '2026-11-12';
+
+function isDiwaliSeason(now = new Date()) {
+  return now <= new Date(`${DIWALI_LAST_DAY}T23:59:59`);
+}
+
+function initDiwali() {
+  const banner = document.getElementById('diwali');
+  if (!banner) return;
+  let dismissed = false;
+  try { dismissed = sessionStorage.getItem('tf-diwali-closed') === '1'; } catch (err) { /* storage blocked */ }
+  if (!isDiwaliSeason() || dismissed) return;
+  banner.hidden = false;
+
+  const canvas = banner.querySelector('.diwali-canvas');
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const colors = ['#ffd21f', '#ffb703', '#fb8500', '#ff6b9a', '#ff4d6d', '#fff3b0', '#ffffff', '#c77dff'];
+  const rockets = [];
+  const sparks = [];
+  let width = 0, height = 0, dpr = 1, running = false, frame = 0, nextLaunch = 0;
+
+  const resize = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = banner.clientWidth;
+    height = banner.clientHeight; // inside the border, same box as the canvas
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  const rand = (min, max) => min + Math.random() * (max - min);
+
+  const launch = () => {
+    // On wide screens keep bursts to the sides so the greeting stays readable
+    const side = Math.random() < 0.5;
+    const x = width > 760
+      ? (side ? rand(width * 0.03, width * 0.3) : rand(width * 0.7, width * 0.97))
+      : rand(width * 0.08, width * 0.92);
+    rockets.push({
+      x,
+      y: height + 5,
+      vy: -rand(height * 0.012, height * 0.017) - 3,
+      targetY: rand(height * 0.12, height * 0.5),
+      color: colors[Math.floor(Math.random() * colors.length)],
+    });
+  };
+
+  const burst = (x, y, color) => {
+    const count = width < 500 ? 34 : 60;
+    const speed = rand(1.6, 3.2);
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + rand(-0.08, 0.08);
+      const v = speed * rand(0.55, 1);
+      sparks.push({
+        x, y,
+        vx: Math.cos(angle) * v,
+        vy: Math.sin(angle) * v,
+        life: 1,
+        decay: rand(0.012, 0.022),
+        color: Math.random() < 0.25 ? '#fff3b0' : color,
+        size: rand(1.2, 2.4),
+      });
+    }
+  };
+
+  const draw = (time) => {
+    if (!running) return;
+    frame = requestAnimationFrame(draw);
+
+    // Fade the previous frame for soft trails, keeping the canvas transparent over the banner
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'lighter';
+
+    if (time > nextLaunch && sparks.length < 600) {
+      launch();
+      nextLaunch = time + rand(450, 1100);
+    }
+
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i];
+      r.y += r.vy;
+      r.vy *= 0.985;
+      ctx.fillStyle = r.color;
+      ctx.fillRect(r.x - 1, r.y, 2, 6);
+      if (r.y <= r.targetY || r.vy > -1) {
+        burst(r.x, r.y, r.color);
+        rockets.splice(i, 1);
+      }
+    }
+
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.vx *= 0.985;
+      s.vy = s.vy * 0.985 + 0.035;
+      s.x += s.vx;
+      s.y += s.vy;
+      s.life -= s.decay;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      ctx.globalAlpha = s.life;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+
+  const start = () => {
+    if (running || reduceMotion) return;
+    running = true;
+    frame = requestAnimationFrame(draw);
+  };
+  const stop = () => {
+    running = false;
+    cancelAnimationFrame(frame);
+  };
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Only animate while the banner is on screen (saves phone battery)
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(banner);
+  } else {
+    start();
+  }
+
+  if (reduceMotion) {
+    // A single still burst instead of the animation
+    for (let i = 0; i < 3; i++) burst(width * (0.2 + i * 0.3), height * 0.35, colors[i * 2]);
+    sparks.forEach((s) => { s.x += s.vx * 18; s.y += s.vy * 18; ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); });
+  }
+
+  banner.querySelector('.diwali-close').addEventListener('click', () => {
+    stop();
+    banner.hidden = true;
+    try { sessionStorage.setItem('tf-diwali-closed', '1'); } catch (err) { /* storage blocked */ }
+  });
+}
+initDiwali();

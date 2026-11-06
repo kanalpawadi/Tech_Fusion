@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=15">
 </head>
 <body>
 
@@ -39,6 +39,22 @@
       </nav>
     </div>
   </header>
+
+  <!-- Diwali greeting (shown by script.js during the festival only) -->
+  <section class="diwali" id="diwali" aria-label="Happy Diwali greeting" hidden>
+    <canvas class="diwali-canvas" aria-hidden="true"></canvas>
+    <div class="container diwali-inner">
+      <span class="diya" aria-hidden="true">🪔</span>
+      <div class="diwali-text">
+        <p class="diwali-local" lang="mr">शुभ दीपावली</p>
+        <h2 class="diwali-title">Happy <span>Diwali</span></h2>
+        <p class="diwali-msg">May the festival of lights fill your home with joy, success and bright ideas. — Team Tech Fusion</p>
+      </div>
+      <span class="diya diya-right" aria-hidden="true">🪔</span>
+    </div>
+    <div class="diwali-lights" aria-hidden="true"></div>
+    <button type="button" class="diwali-close" aria-label="Close Diwali greeting">×</button>
+  </section>
 
   <!-- Hero -->
   <section class="hero">
@@ -688,6 +704,6 @@
   </div>
 
   <script src="invoice.js?v=8"></script>
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=14"></script>
 </body>
 </html>
