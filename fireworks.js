@@ -1,6 +1,6 @@
 // Diwali fireworks shared by every page (index.html, invoice.html)
 // Diwali greeting: shown until the end of DIWALI_LAST_DAY (visitor's local time), with looping fireworks
-const DIWALI_LAST_DAY = '2026-11-12';
+const DIWALI_LAST_DAY = '2026-11-15';
 
 function isDiwaliSeason(now = new Date()) {
   return now <= new Date(`${DIWALI_LAST_DAY}T23:59:59`);
@@ -135,6 +135,8 @@ function createFireworks(canvas, opts) {
 
   return {
     start() { if (running) return; running = true; lastTime = 0; raf = requestAnimationFrame(frame); },
+    // extra burst where the visitor taps or clicks (capped so rapid tapping can't overload slow phones)
+    burstAt(x, y) { if (running && sparks.length < opts.maxSparks * 4) burst(x, y); },
     stop() { running = false; cancelAnimationFrame(raf); ctx.clearRect(0, 0, width, height); },
     // one still burst (for visitors who prefer reduced motion)
     still(points) {
@@ -178,7 +180,10 @@ function startPageFireworks() {
     maxSparks: 120, // about two bursts at a time
   });
   pageFw.start();
-  return () => { pageFw.stop(); layer.remove(); };
+  // every tap / click sets off a burst at that spot (taps still reach the page underneath)
+  const onTap = (e) => pageFw.burstAt(e.clientX, e.clientY);
+  document.addEventListener('pointerdown', onTap, { passive: true });
+  return () => { document.removeEventListener('pointerdown', onTap); pageFw.stop(); layer.remove(); };
 }
 
 // Fireworks are on while it is Diwali, the visitor hasn't closed the greeting and motion is allowed

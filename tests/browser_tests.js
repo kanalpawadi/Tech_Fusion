@@ -65,8 +65,8 @@ export async function run() {
   const dw = $('#diwali');
   if (dw) {
     check('Diwali', 'season check: on during festival', isDiwaliSeason(new Date('2026-11-08T20:00:00')) === true);
-    check('Diwali', 'season check: on until end of 12 Nov', isDiwaliSeason(new Date('2026-11-12T23:59:00')) === true);
-    check('Diwali', 'season check: off from 13 Nov', isDiwaliSeason(new Date('2026-11-13T00:00:01')) === false);
+    check('Diwali', 'season check: on until end of 15 Nov', isDiwaliSeason(new Date('2026-11-15T23:59:00')) === true);
+    check('Diwali', 'season check: off from 16 Nov', isDiwaliSeason(new Date('2026-11-16T00:00:01')) === false);
     const shouldShow = isDiwaliSeason() && (() => { try { return sessionStorage.getItem('tf-diwali-closed') !== '1'; } catch { return true; } })();
     check('Diwali', `banner ${shouldShow ? 'shown' : 'hidden'} today as expected`, isVisible(dw) === shouldShow);
     if (shouldShow) {

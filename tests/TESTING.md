@@ -154,7 +154,7 @@ await import('/tests/responsive_audit.js?v=' + Date.now()).then(m => m.audit())
 
 ## Round 7 — Diwali greeting (2026-11-06)
 
-Banner under the menu: "शुभ दीपावली · Happy Diwali" with looping fireworks (canvas), shimmering gold title, flickering diyas and twinkling string lights. Shown until the end of **12 Nov 2026** (`DIWALI_LAST_DAY` in `script.js`), closable (stays closed for the visit), animation pauses when scrolled off-screen, and is still (no animation) for visitors who turn on "reduce motion".
+Banner under the menu: "शुभ दीपावली · Happy Diwali" with looping fireworks (canvas), shimmering gold title, flickering diyas and twinkling string lights. Shown until the end of **15 Nov 2026** (`DIWALI_LAST_DAY` in `script.js`), closable (stays closed for the visit), animation pauses when scrolled off-screen, and is still (no animation) for visitors who turn on "reduce motion".
 
 | Suite | Width | Result |
 |---|---|---|
@@ -165,7 +165,7 @@ Banner under the menu: "शुभ दीपावली · Happy Diwali" with lo
 
 ## Round 8 — fireworks across the whole site + 2 new gallery photos (2026-11-06)
 
-- One fireworks engine (`createFireworks` in `script.js`) now drives both the banner and a see-through layer over the whole page. Bursts are rings of dotted, fading rays (green, white, red, orange, gold), timed by the clock so they last ~1.5 s on fast and slow devices. Page layer: strong colours with a faint halo so they show on white sections too, at most ~2 bursts at a time, below the menu / WhatsApp button / photo viewer, never blocks taps (`pointer-events: none`). Off for reduced-motion visitors; closing the greeting removes it; hides after 12 Nov 2026 with the banner.
+- One fireworks engine (`createFireworks` in `script.js`) now drives both the banner and a see-through layer over the whole page. Bursts are rings of dotted, fading rays (green, white, red, orange, gold), timed by the clock so they last ~1.5 s on fast and slow devices. Page layer: strong colours with a faint halo so they show on white sections too, at most ~2 bursts at a time, below the menu / WhatsApp button / photo viewer, never blocks taps (`pointer-events: none`). Off for reduced-motion visitors; closing the greeting removes it; hides after 15 Nov 2026 with the banner.
 - Gallery: `photo-12.jpg` (team felicitated by college faculty, wide) and `photo-11.jpg` (student presenting in a college training session, tall). Tablet (3-column) gallery now has full rows.
 - Measured ~106 fps with both fireworks running.
 

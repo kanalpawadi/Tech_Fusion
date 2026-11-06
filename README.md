@@ -19,7 +19,7 @@ Plain HTML, CSS and JavaScript, so there's no build step or framework.
 
 ## Festival banner
 
-A "Happy Diwali" banner with fireworks shows under the menu until the date set in `DIWALI_LAST_DAY` (top of the Diwali section in `script.js`, currently `2026-11-12`). After that date it hides itself — no need to remove it. Change the date (and the text in `index.html`) to reuse it next year.
+A "Happy Diwali" banner with fireworks shows under the menu until the date set in `DIWALI_LAST_DAY` (top of the Diwali section in `script.js`, currently `2026-11-15`). After that date it hides itself — no need to remove it. Change the date (and the text in `index.html`) to reuse it next year.
 
 ## Project bookings
 
