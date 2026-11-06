@@ -50,7 +50,8 @@
       .bar #whatsapp { grid-column: 1 / -1; }
     }
     @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
-    @media print { .bar, .success { display: none; } body { background: #fff; } .wrap { padding: 0; } }
+    .site-fireworks { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+    @media print { .bar, .success, .site-fireworks { display: none; } body { background: #fff; } .wrap { padding: 0; } }
     @media (prefers-reduced-motion: reduce) { .success .tick { animation: none; } }
   </style>
   <style id="invoice-css"></style>
@@ -78,6 +79,7 @@
     <p><a href="index.html#register">Register a project</a></p>
   </section>
 
+  <script src="fireworks.js?v=1"></script>
   <script src="invoice.js?v=8"></script>
   <script>
     (function () {
@@ -123,5 +125,6 @@
         `https://wa.me/${T.BUSINESS.whatsapp}?text=${encodeURIComponent(T.whatsappText(booking))}`;
     })();
   </script>
+  <script>if (pageFireworksWanted()) startPageFireworks();</script>
 </body>
 </html>

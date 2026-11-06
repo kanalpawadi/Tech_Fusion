@@ -13,6 +13,7 @@ Plain HTML, CSS and JavaScript, so there's no build step or framework.
 | `index.html` | Main page: services, tech stack, projects (with filters), process, training, gallery, project registration form, review, contact |
 | `invoice.html` | Booking invoice shown after someone registers a project |
 | `invoice.js` | Builds the invoice and sends the booking emails (shared by both pages) |
+| `fireworks.js` | Diwali fireworks shared by both pages |
 | `script.js` | Menu, gallery, project filters, enquiry and registration forms |
 | `styles.css` | Black & yellow theme |
 
