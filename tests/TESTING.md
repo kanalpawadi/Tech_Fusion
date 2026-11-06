@@ -162,3 +162,16 @@ Banner under the menu: "शुभ दीपावली · Happy Diwali" with lo
 | Browser components | 1280 / 768 px | 260 / 260 pass |
 | Browser components | 360 px | 265 / 265 pass |
 | Layout audit | 18 sizes, 280 px – 1440 px | all OK; close button never covers text |
+
+## Round 8 — fireworks across the whole site + 2 new gallery photos (2026-11-06)
+
+- One fireworks engine (`createFireworks` in `script.js`) now drives both the banner and a see-through layer over the whole page. Bursts are rings of dotted, fading rays (green, white, red, orange, gold), timed by the clock so they last ~1.5 s on fast and slow devices. Page layer: strong colours with a faint halo so they show on white sections too, at most ~2 bursts at a time, below the menu / WhatsApp button / photo viewer, never blocks taps (`pointer-events: none`). Off for reduced-motion visitors; closing the greeting removes it; hides after 12 Nov 2026 with the banner.
+- Gallery: `photo-12.jpg` (team felicitated by college faculty, wide) and `photo-11.jpg` (student presenting in a college training session, tall). Tablet (3-column) gallery now has full rows.
+- Measured ~106 fps with both fireworks running.
+
+| Suite | Width | Result |
+|---|---|---|
+| Static checks | — | 74 / 74 pass |
+| Browser components | 1280 / 768 px | 268 / 268 pass |
+| Browser components | 360 px | 273 / 273 pass |
+| Layout audit + full gallery rows | 21 sizes, 280 – 1440 px (incl. 760/761) | all OK |

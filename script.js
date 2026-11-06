@@ -409,6 +409,158 @@ function isDiwaliSeason(now = new Date()) {
   return now <= new Date(`${DIWALI_LAST_DAY}T23:59:59`);
 }
 
+// Fireworks engine shared by the banner and the whole-page layer.
+// Each burst is a ring of rays drawn as fading dotted trails (green, white, red, orange, gold).
+function createFireworks(canvas, opts) {
+  const ctx = canvas.getContext('2d');
+  const palette = opts.palette || ['#7cffb2', '#3ddc97', '#ffffff', '#ff4d4d', '#ff8c42', '#ffd21f', '#5eead4', '#ff6b9a'];
+  const sparkle = opts.sparkle || '#ffffff';
+  const blend = opts.blend || 'lighter';
+  const rockets = [];
+  const sparks = [];
+  const TRAIL = 7;
+  let width = 0, height = 0, running = false, raf = 0, nextLaunch = 0, lastTime = 0;
+  const rand = (min, max) => min + Math.random() * (max - min);
+  const pick = () => palette[Math.floor(Math.random() * palette.length)];
+
+  const resize = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2);
+    // fixed layer: the visible viewport without the scrollbar
+    width = opts.fixed ? document.documentElement.clientWidth : canvas.parentElement.clientWidth;
+    height = opts.fixed ? document.documentElement.clientHeight : canvas.parentElement.clientHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  const launch = () => {
+    let x = rand(width * 0.08, width * 0.92);
+    if (opts.sideBias && width > 760) {
+      // keep bursts beside the greeting so it stays readable
+      x = Math.random() < 0.5 ? rand(width * 0.03, width * 0.3) : rand(width * 0.7, width * 0.97);
+    }
+    const targetY = opts.fixed ? rand(height * 0.12, height * 0.7) : rand(height * 0.15, height * 0.5);
+    const startY = opts.fixed ? Math.min(height + 10, targetY + rand(150, 260)) : height + 5;
+    rockets.push({ x, y: startY, targetY, vy: -rand(7, 10), trail: [] });
+  };
+
+  const burst = (x, y) => {
+    const radius = opts.radius(width, height);
+    const rays = width < 500 ? opts.rays[0] : opts.rays[1];
+    const main = pick();
+    const second = pick();
+    for (let i = 0; i < rays; i++) {
+      const angle = (Math.PI * 2 * i) / rays + rand(-0.06, 0.06);
+      // with 0.96 friction a spark travels about 25 × its starting speed
+      const speed = (radius / 25) * rand(0.7, 1.05);
+      sparks.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: rand(0.011, 0.017),
+        color: Math.random() < 0.2 ? sparkle : (i % 3 === 0 ? second : main),
+        size: rand(1.3, 2.3),
+        trail: [],
+      });
+    }
+  };
+
+  const dottedTrail = (trail, color, size, alpha) => {
+    ctx.fillStyle = color;
+    for (let k = 0; k < trail.length; k++) {
+      const f = (k + 1) / trail.length;
+      ctx.globalAlpha = alpha * f * 0.9;
+      ctx.beginPath();
+      ctx.arc(trail[k].x, trail[k].y, size * (0.35 + 0.65 * f), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  const frame = (time) => {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+    // dt = frames elapsed at 60 fps, so bursts last the same time on fast and slow devices
+    const dt = lastTime ? Math.min((time - lastTime) / 16.67, 4) : 1;
+    lastTime = time;
+    const drag = Math.pow(0.96, dt);
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = blend;
+
+    if (time > nextLaunch && sparks.length < opts.maxSparks) {
+      launch();
+      nextLaunch = time + rand(opts.interval[0], opts.interval[1]);
+    }
+
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i];
+      r.trail.push({ x: r.x, y: r.y });
+      if (r.trail.length > TRAIL) r.trail.shift();
+      r.y += r.vy * dt;
+      r.vy *= Math.pow(0.975, dt);
+      dottedTrail(r.trail, '#ffd98a', 1.6, 0.9);
+      if (r.y <= r.targetY || r.vy > -1.2) {
+        burst(r.x, r.y);
+        rockets.splice(i, 1);
+      }
+    }
+
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.trail.push({ x: s.x, y: s.y });
+      if (s.trail.length > TRAIL) s.trail.shift();
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vx *= drag;
+      s.vy = s.vy * drag + 0.045 * dt;
+      s.life -= s.decay * dt;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      if (opts.shadow) {
+        // faint dark halo so sparks stay visible over white sections
+        ctx.globalAlpha = s.life * 0.22;
+        ctx.fillStyle = '#1a0f00';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      dottedTrail(s.trail, s.color, s.size, s.life);
+      // brighter head
+      ctx.globalAlpha = s.life;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size * 1.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  return {
+    start() { if (running) return; running = true; lastTime = 0; raf = requestAnimationFrame(frame); },
+    stop() { running = false; cancelAnimationFrame(raf); ctx.clearRect(0, 0, width, height); },
+    // one still burst (for visitors who prefer reduced motion)
+    still(points) {
+      ctx.globalCompositeOperation = blend;
+      points.forEach(([fx, fy]) => {
+        const before = sparks.length;
+        burst(width * fx, height * fy);
+        sparks.slice(before).forEach((s) => {
+          ctx.fillStyle = s.color;
+          for (let k = 1; k <= 5; k++) {
+            ctx.globalAlpha = 0.25 + k * 0.15;
+            ctx.beginPath();
+            ctx.arc(s.x + s.vx * k * 4, s.y + s.vy * k * 4, s.size * (0.4 + k * 0.12), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        sparks.length = before;
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
 function initDiwali() {
   const banner = document.getElementById('diwali');
   if (!banner) return;
@@ -417,130 +569,53 @@ function initDiwali() {
   if (!isDiwaliSeason() || dismissed) return;
   banner.hidden = false;
 
-  const canvas = banner.querySelector('.diwali-canvas');
-  const ctx = canvas.getContext('2d');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const colors = ['#ffd21f', '#ffb703', '#fb8500', '#ff6b9a', '#ff4d6d', '#fff3b0', '#ffffff', '#c77dff'];
-  const rockets = [];
-  const sparks = [];
-  let width = 0, height = 0, dpr = 1, running = false, frame = 0, nextLaunch = 0;
 
-  const resize = () => {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    width = banner.clientWidth;
-    height = banner.clientHeight; // inside the border, same box as the canvas
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  };
+  // Fireworks inside the banner
+  const bannerFw = createFireworks(banner.querySelector('.diwali-canvas'), {
+    sideBias: true,
+    interval: [450, 1000],
+    rays: [36, 56],
+    radius: (w, h) => h * (Math.random() * 0.15 + 0.28),
+    maxSparks: 700,
+  });
 
-  const rand = (min, max) => min + Math.random() * (max - min);
-
-  const launch = () => {
-    // On wide screens keep bursts to the sides so the greeting stays readable
-    const side = Math.random() < 0.5;
-    const x = width > 760
-      ? (side ? rand(width * 0.03, width * 0.3) : rand(width * 0.7, width * 0.97))
-      : rand(width * 0.08, width * 0.92);
-    rockets.push({
-      x,
-      y: height + 5,
-      vy: -rand(height * 0.012, height * 0.017) - 3,
-      targetY: rand(height * 0.12, height * 0.5),
-      color: colors[Math.floor(Math.random() * colors.length)],
-    });
-  };
-
-  const burst = (x, y, color) => {
-    const count = width < 500 ? 34 : 60;
-    const speed = rand(1.6, 3.2);
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count + rand(-0.08, 0.08);
-      const v = speed * rand(0.55, 1);
-      sparks.push({
-        x, y,
-        vx: Math.cos(angle) * v,
-        vy: Math.sin(angle) * v,
-        life: 1,
-        decay: rand(0.012, 0.022),
-        color: Math.random() < 0.25 ? '#fff3b0' : color,
-        size: rand(1.2, 2.4),
-      });
-    }
-  };
-
-  const draw = (time) => {
-    if (!running) return;
-    frame = requestAnimationFrame(draw);
-
-    // Fade the previous frame for soft trails, keeping the canvas transparent over the banner
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-    ctx.fillRect(0, 0, width, height);
-    ctx.globalCompositeOperation = 'lighter';
-
-    if (time > nextLaunch && sparks.length < 600) {
-      launch();
-      nextLaunch = time + rand(450, 1100);
-    }
-
-    for (let i = rockets.length - 1; i >= 0; i--) {
-      const r = rockets[i];
-      r.y += r.vy;
-      r.vy *= 0.985;
-      ctx.fillStyle = r.color;
-      ctx.fillRect(r.x - 1, r.y, 2, 6);
-      if (r.y <= r.targetY || r.vy > -1) {
-        burst(r.x, r.y, r.color);
-        rockets.splice(i, 1);
-      }
-    }
-
-    for (let i = sparks.length - 1; i >= 0; i--) {
-      const s = sparks[i];
-      s.vx *= 0.985;
-      s.vy = s.vy * 0.985 + 0.035;
-      s.x += s.vx;
-      s.y += s.vy;
-      s.life -= s.decay;
-      if (s.life <= 0) { sparks.splice(i, 1); continue; }
-      ctx.globalAlpha = s.life;
-      ctx.fillStyle = s.color;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  };
-
-  const start = () => {
-    if (running || reduceMotion) return;
-    running = true;
-    frame = requestAnimationFrame(draw);
-  };
-  const stop = () => {
-    running = false;
-    cancelAnimationFrame(frame);
-  };
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Only animate while the banner is on screen (saves phone battery)
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(banner);
-  } else {
-    start();
-  }
+  // A see-through fireworks layer over the whole page (never blocks taps or clicks)
+  const layer = document.createElement('canvas');
+  layer.className = 'site-fireworks';
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(layer);
+  const pageFw = createFireworks(layer, {
+    fixed: true,
+    maxDpr: 1.5,
+    // strong colours + faint halo: readable over both the dark and the white sections
+    palette: ['#16a34a', '#22c55e', '#f97316', '#ea580c', '#e11d48', '#db2777', '#f59e0b', '#7c3aed', '#0891b2'],
+    sparkle: '#f59e0b',
+    blend: 'source-over',
+    shadow: true,
+    interval: [1500, 3000],
+    rays: [40, 56],
+    radius: (w) => (w < 500 ? 45 : 65) + Math.random() * (w < 500 ? 35 : 55),
+    maxSparks: 120, // about two bursts at a time
+  });
 
   if (reduceMotion) {
-    // A single still burst instead of the animation
-    for (let i = 0; i < 3; i++) burst(width * (0.2 + i * 0.3), height * 0.35, colors[i * 2]);
-    sparks.forEach((s) => { s.x += s.vx * 18; s.y += s.vy * 18; ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); });
+    bannerFw.still([[0.15, 0.4], [0.85, 0.35]]);
+  } else {
+    pageFw.start();
+    if ('IntersectionObserver' in window) {
+      // banner fireworks only while the banner is on screen (saves phone battery)
+      new IntersectionObserver(([entry]) => (entry.isIntersecting ? bannerFw.start() : bannerFw.stop())).observe(banner);
+    } else {
+      bannerFw.start();
+    }
   }
 
+  // Closing the greeting stops all fireworks for this visit
   banner.querySelector('.diwali-close').addEventListener('click', () => {
-    stop();
+    bannerFw.stop();
+    pageFw.stop();
+    layer.remove();
     banner.hidden = true;
     try { sessionStorage.setItem('tf-diwali-closed', '1'); } catch (err) { /* storage blocked */ }
   });

@@ -76,12 +76,26 @@ export async function run() {
       check('Diwali', 'canvas hidden from screen readers', cv.getAttribute('aria-hidden') === 'true');
       check('Diwali', 'banner sits right under the menu', dw.previousElementSibling === $('.nav'));
       check('Diwali', 'title is large and white/gold', parseFloat(getComputedStyle($('.diwali-title')).fontSize) >= 30);
+      const layer = $('.site-fireworks');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      check('Diwali', 'whole-page fireworks layer present', !!layer);
+      if (layer) {
+        const ls = getComputedStyle(layer);
+        check('Diwali', 'page fireworks never block taps or clicks', ls.pointerEvents === 'none');
+        check('Diwali', 'page fireworks cover the screen, not stretched', ls.position === 'fixed' && Math.abs(layer.getBoundingClientRect().width - document.documentElement.clientWidth) < 2 && Math.abs(layer.width / layer.getBoundingClientRect().width - layer.height / layer.getBoundingClientRect().height) < 0.05);
+        check('Diwali', 'page fireworks sit under menu, WhatsApp button and photo viewer', +ls.zIndex < +getComputedStyle($('.nav')).zIndex && +ls.zIndex < +getComputedStyle($('.wa-float')).zIndex && +ls.zIndex < +getComputedStyle($('#lightbox')).zIndex);
+        check('Diwali', 'page fireworks hidden from screen readers', layer.getAttribute('aria-hidden') === 'true');
+        const mid = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+        check('Diwali', 'taps reach the page through the fireworks', mid && mid !== layer);
+      }
+      void reduce;
       const close = dw.querySelector('.diwali-close');
       check('Diwali', 'close button labelled and tappable', close.getAttribute('aria-label') && close.offsetWidth >= 44 && close.offsetHeight >= 44);
       close.click(); await wait();
       let stored = null; try { stored = sessionStorage.getItem('tf-diwali-closed'); } catch {}
       check('Diwali', 'close button hides the banner', !isVisible(dw));
       check('Diwali', 'stays closed while browsing (session)', stored === '1');
+      check('Diwali', 'closing also removes the page fireworks', !$('.site-fireworks'));
       // put it back for the rest of the tests / the visitor
       try { sessionStorage.removeItem('tf-diwali-closed'); } catch {}
       dw.hidden = false;
@@ -392,7 +406,8 @@ export async function run() {
 
   // ---------- Gallery ----------
   const figs = $$('.gallery figure');
-  check('Gallery', '13 photos', figs.length === 13, figs.length);
+  check('Gallery', '15 photos', figs.length === 15, figs.length);
+  check('Gallery', 'new college photos included', ['photo-11.jpg', 'photo-12.jpg'].every((n) => figs.some((f) => f.querySelector('img').src.endsWith(n))));
   const gImgs = figs.map((f) => f.querySelector('img'));
   for (const img of gImgs) { img.loading = 'eager'; }
   await Promise.all(gImgs.map(loaded));

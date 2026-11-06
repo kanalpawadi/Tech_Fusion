@@ -908,7 +908,15 @@ h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.15; }
 .split-media img:nth-child(2) { margin-top: 48px; }
 
 /* Gallery */
-.gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; gap: 12px; }
+.gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; grid-auto-flow: dense; gap: 12px; }
+.gallery .g-tall { grid-row: span 2; }
+/* 3-column gallery (tablets): one extra wide photo so the rows come out even */
+@media (max-width: 980px) {
+  .gallery .g-wide-3col { grid-column: span 2; }
+}
+@media (max-width: 760px) {
+  .gallery .g-wide-3col { grid-column: auto; }
+}
 .gallery figure { overflow: hidden; border-radius: 10px; cursor: zoom-in; background: var(--black); position: relative; }
 .gallery .g-wide { grid-column: span 2; }
 .gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s, opacity .3s; }
@@ -1174,6 +1182,15 @@ h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.15; }
 }
 .diwali[hidden] { display: none; }
 .diwali-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+/* Whole-page fireworks: above the content, below the menu (50), WhatsApp button (60) and photo viewer (100) */
+.site-fireworks {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 45;
+  pointer-events: none;
+}
 .diwali-inner {
   display: flex;
   align-items: center;
